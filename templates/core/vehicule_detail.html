@@ -2,64 +2,210 @@
 {% load static %}
 
 {% block title %}{{ vehicule.titre }}{% endblock %}
+{% block body_class %}page-vehicule-detail{% endblock %}
 
 {% block content %}
-  <div class="vehicule-detail-hero">
-    <div class="detail-gallery">
-      {% if vehicule.image_principale %}
-        <img src="{{ vehicule.image_principale.url }}" alt="{{ vehicule.titre }}">
-      {% elif vehicule.image_url %}
-        <img src="{{ vehicule.image_url }}" alt="{{ vehicule.titre }}">
-      {% else %}
-        <img src="https://placehold.co/1400x600/1c1c1c/c38c37?text={{ vehicule.titre|urlencode }}" alt="{{ vehicule.titre }}">
-      {% endif %}
-    </div>
-
-    <div class="detail-content">
-      <div>
-        <p class="card-marque">{{ vehicule.get_marque_display }}</p>
-        <h1 class="card-title" style="font-size: 2rem; margin-bottom: 1rem;">{{ vehicule.titre }}</h1>
-        <p class="card-price">{{ vehicule.prix|floatformat:0 }} €</p>
-
-        <div class="detail-specs-grid">
-          <div class="detail-spec">
-            <strong>Année</strong>
-            <span>{{ vehicule.annee }}</span>
+  <article class="vd-page">
+    <div class="vd-layout">
+      <!-- Colonne gauche : galerie -->
+      <div class="vd-gallery">
+        <div class="vd-gallery-main">
+          <div class="vd-gallery-main-inner">
+            {% if vehicule.image_principale %}
+              <img id="vd-gallery-main" src="{{ vehicule.image_principale.url }}" alt="{{ vehicule.titre }}">
+            {% elif vehicule.image_url %}
+              <img id="vd-gallery-main" src="{{ vehicule.image_url }}" alt="{{ vehicule.titre }}">
+            {% else %}
+              <img id="vd-gallery-main" src="https://placehold.co/1200x800/2B2F34/BFC3C9?text={{ vehicule.titre|urlencode }}" alt="{{ vehicule.titre }}">
+            {% endif %}
           </div>
-          <div class="detail-spec">
-            <strong>Kilométrage</strong>
-            <span>{{ vehicule.kilometrage|floatformat:0 }} km</span>
-          </div>
-          {% if vehicule.puissance_ch %}
-            <div class="detail-spec">
-              <strong>Puissance</strong>
-              <span>{{ vehicule.puissance_ch }} ch</span>
-            </div>
-          {% endif %}
-          {% if vehicule.moteur %}
-            <div class="detail-spec">
-              <strong>Moteur</strong>
-              <span>{{ vehicule.moteur }}</span>
-            </div>
-          {% endif %}
+          <div class="vd-gallery-accent" aria-hidden="true"></div>
         </div>
-
-        {% if vehicule.description %}
-          <div class="detail-description">
-            <h3>Présentation</h3>
-            <p>{{ vehicule.description }}</p>
+        <div class="vd-gallery-thumbs-wrap">
+          <button type="button" class="vd-gallery-nav vd-gallery-prev" aria-label="Image précédente">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div class="vd-gallery-thumbs" role="tablist">
+            <button type="button" class="vd-thumb is-active" data-src="{% if vehicule.image_principale %}{{ vehicule.image_principale.url }}{% elif vehicule.image_url %}{{ vehicule.image_url }}{% else %}https://placehold.co/1200x800/2B2F34/BFC3C9?text={{ vehicule.titre|urlencode }}{% endif %}" aria-label="Vue 1">
+              {% if vehicule.image_principale %}
+                <img src="{{ vehicule.image_principale.url }}" alt="">
+              {% elif vehicule.image_url %}
+                <img src="{{ vehicule.image_url }}" alt="">
+              {% else %}
+                <img src="https://placehold.co/120x80/2B2F34/BFC3C9?text=1" alt="">
+              {% endif %}
+            </button>
+            {% for img in vehicule.images.all %}
+              {% with img_url=img.get_image_display_url %}
+                {% if img_url %}
+                  <button type="button" class="vd-thumb" data-src="{{ img_url }}" aria-label="Vue {{ forloop.counter|add:1 }}">
+                    <img src="{{ img_url }}" alt="{{ img.legende|default:'' }}">
+                  </button>
+                {% endif %}
+              {% endwith %}
+            {% endfor %}
           </div>
-        {% endif %}
+          <button type="button" class="vd-gallery-nav vd-gallery-next" aria-label="Image suivante">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
       </div>
 
-      <aside class="detail-sidebar">
-        <div class="detail-cta-box">
-          <p class="detail-price">{{ vehicule.prix|floatformat:0 }} €</p>
-          <p>Ce véhicule vous intéresse ? Visite et essai uniquement sur rendez-vous. Pas de vente en ligne.</p>
-          <a href="tel:+33000000000" class="btn btn-primary">Appeler pour un rendez-vous</a>
-          <a href="#contact" class="btn btn-outline" style="margin-top: 0.5rem;">Voir nos coordonnées</a>
+      <!-- Colonne droite : infos + specs + accordéons + CTA -->
+      <div class="vd-content">
+        <div class="vd-content-card">
+          <span class="vd-badge">{{ vehicule.get_marque_display }}</span>
+          <h1 class="vd-title">{{ vehicule.titre }}</h1>
+          <p class="vd-price">{{ vehicule.prix|floatformat:0 }} €</p>
+
+          <div class="vd-specs-block">
+            <ul class="vd-specs-inline">
+          <li>
+            <span class="vd-spec-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </span>
+            <span>Kilométrage : {{ vehicule.kilometrage|floatformat:0 }} km</span>
+          </li>
+          <li>
+            <span class="vd-spec-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </span>
+            <span>Visible sur le site de : Sur demande</span>
+          </li>
+          <li>
+            <span class="vd-spec-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </span>
+            <span>Mise en circulation : {{ vehicule.annee }}</span>
+          </li>
+          {% if vehicule.puissance_ch %}
+            <li>
+              <span class="vd-spec-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              </span>
+              <span>Puissance : {{ vehicule.puissance_ch }} ch</span>
+            </li>
+          {% endif %}
+          {% if vehicule.moteur %}
+            <li>
+              <span class="vd-spec-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 6V4M18 6V4M6 12h12M6 16h12"/></svg>
+              </span>
+              <span>Moteur : {{ vehicule.moteur }}</span>
+            </li>
+          {% endif %}
+            </ul>
+          </div>
+
+          <div class="vd-accordions">
+          {% if vehicule.options.exists %}
+            <details class="vd-accordion" open>
+              <summary class="vd-accordion-head">
+                <span class="vd-accordion-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15 8 22 9 17 14 18 21 12 18 6 21 7 14 2 9 9 8"/></svg>
+                </span>
+                <span class="vd-accordion-title">Options</span>
+                <span class="vd-accordion-plus" aria-hidden="true">+</span>
+              </summary>
+              <div class="vd-accordion-body">
+                <ul class="vd-options-list">
+                  {% for opt in vehicule.options.all %}
+                    <li>{{ opt.libelle }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </details>
+          {% endif %}
+
+          {% if vehicule.description %}
+            <details class="vd-accordion" {% if not vehicule.options.exists %}open{% endif %}>
+              <summary class="vd-accordion-head">
+                <span class="vd-accordion-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                </span>
+                <span class="vd-accordion-title">Description</span>
+                <span class="vd-accordion-plus" aria-hidden="true">+</span>
+              </summary>
+              <div class="vd-accordion-body">
+                <div class="vd-description-text">
+                  {{ vehicule.description|linebreaks }}
+                </div>
+              </div>
+            </details>
+          {% endif %}
+
+          <details class="vd-accordion">
+            <summary class="vd-accordion-head">
+              <span class="vd-accordion-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              </span>
+              <span class="vd-accordion-title">Financement</span>
+              <span class="vd-accordion-plus" aria-hidden="true">+</span>
+            </summary>
+            <div class="vd-accordion-body">
+              <p class="vd-accordion-note">Visite et essai sur rendez-vous. Solutions de financement possibles sur demande.</p>
+            </div>
+          </details>
+          </div>
+
+          <div class="vd-cta-wrap">
+            <a href="tel:+330478219647" class="vd-btn vd-btn-primary vd-btn-cta">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              Contacter pour un rendez-vous
+            </a>
+            <a href="#contact" class="vd-btn vd-btn-outline">Voir les coordonnées</a>
+          </div>
         </div>
-      </aside>
+      </div>
     </div>
-  </div>
+  </article>
+
+  <script>
+    (function() {
+      var main = document.getElementById('vd-gallery-main');
+      var strip = document.querySelector('.vd-gallery-thumbs');
+      if (!main || !strip) return;
+
+      var thumbs = Array.prototype.slice.call(strip.querySelectorAll('.vd-thumb'));
+      var currentIndex = 0;
+
+      function setActive(index) {
+        if (index < 0) index = thumbs.length - 1;
+        if (index >= thumbs.length) index = 0;
+        currentIndex = index;
+        var btn = thumbs[index];
+        if (!btn) return;
+        var src = btn.getAttribute('data-src');
+        if (src) {
+          main.classList.add('vd-gallery-img-fade');
+          setTimeout(function() {
+            main.src = src;
+            main.classList.remove('vd-gallery-img-fade');
+          }, 150);
+        }
+        thumbs.forEach(function(b) { b.classList.remove('is-active'); });
+        btn.classList.add('is-active');
+        // Faire défiler la bande pour que la miniature active soit visible
+        var stripRect = strip.getBoundingClientRect();
+        var btnRect = btn.getBoundingClientRect();
+        var scrollLeft = strip.scrollLeft;
+        if (btnRect.left < stripRect.left) {
+          strip.scrollTo({ left: scrollLeft + (btnRect.left - stripRect.left), behavior: 'smooth' });
+        } else if (btnRect.right > stripRect.right) {
+          strip.scrollTo({ left: scrollLeft + (btnRect.right - stripRect.right), behavior: 'smooth' });
+        }
+      }
+
+      thumbs.forEach(function(btn, i) {
+        btn.addEventListener('click', function() {
+          setActive(i);
+        });
+      });
+
+      var prev = document.querySelector('.vd-gallery-prev');
+      var next = document.querySelector('.vd-gallery-next');
+      if (prev) prev.addEventListener('click', function() { setActive(currentIndex - 1); });
+      if (next) next.addEventListener('click', function() { setActive(currentIndex + 1); });
+    })();
+  </script>
 {% endblock %}

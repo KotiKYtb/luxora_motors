@@ -1,0 +1,53 @@
+{% extends "cms/base_cms.html" %}
+{% block title %}Véhicules{% endblock %}
+
+{% block content %}
+  <div class="cms-page-header">
+    <h1 class="cms-page-title">Véhicules</h1>
+    <a href="{% url 'cms_vehicule_create' %}" class="cms-btn cms-btn-primary">+ Ajouter un véhicule</a>
+  </div>
+
+  <div class="cms-table-wrap">
+    <table class="cms-table">
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Titre</th>
+          <th>Marque</th>
+          <th>Année</th>
+          <th>Prix</th>
+          <th>Vedette</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for v in vehicules %}
+          <tr>
+            <td class="cms-cell-img">
+              {% if v.image_principale %}
+                <img src="{{ v.image_principale.url }}" alt="" class="cms-thumb">
+              {% elif v.image_url %}
+                <img src="{{ v.image_url }}" alt="" class="cms-thumb">
+              {% else %}
+                <span class="cms-thumb cms-thumb-placeholder">—</span>
+              {% endif %}
+            </td>
+            <td>{{ v.titre }}</td>
+            <td>{{ v.get_marque_display }}</td>
+            <td>{{ v.annee }}</td>
+            <td>{{ v.prix|floatformat:0 }} €</td>
+            <td>{% if v.en_vedette %}Oui{% else %}—{% endif %}</td>
+            <td class="cms-cell-actions">
+              <a href="{% url 'cms_vehicule_edit' v.pk %}" class="cms-btn cms-btn-sm cms-btn-outline">Modifier</a>
+              <a href="{% url 'cms_vehicule_delete' v.pk %}" class="cms-btn cms-btn-sm cms-btn-danger">Supprimer</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="7" class="cms-empty">Aucun véhicule. <a href="{% url 'cms_vehicule_create' %}">Ajouter un véhicule</a>.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

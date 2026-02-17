@@ -1,0 +1,15 @@
+{% extends "cms/base_cms.html" %}
+{% block title %}Supprimer {{ vehicule.titre }}{% endblock %}
+
+{% block content %}
+  <div class="cms-delete-box">
+    <h1 class="cms-page-title">Supprimer le véhicule</h1>
+    <p>Êtes-vous sûr de vouloir supprimer <strong>{{ vehicule.titre }}</strong> ({{ vehicule.get_marque_display }}, {{ vehicule.annee }}) ?</p>
+    <p class="cms-delete-warn">Cette action est irréversible.</p>
+    <form method="post" class="cms-delete-actions">
+      {% csrf_token %}
+      <button type="submit" class="cms-btn cms-btn-danger">Oui, supprimer</button>
+      <a href="{% url 'cms_vehicule_list' %}" class="cms-btn cms-btn-outline">Annuler</a>
+    </form>
+  </div>
+{% endblock %}

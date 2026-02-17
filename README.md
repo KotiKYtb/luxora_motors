@@ -1,14 +1,14 @@
-# Luxura Motors
+# luxora Motors
 
 Site vitrine pour l’achat et la revente de véhicules d’exception (Lamborghini, Ferrari, Porsche, McLaren, etc.).  
 **Pas de vente en ligne** : prise de rendez-vous et contact par téléphone uniquement.
 
 ## Palette
 
-- **Principal** : Vert `#0e2f28`
-- **Secondaire (détails)** : Jaune `#c38c37`
-- **Texte** : Blanc `#f4f1ea`
-- **Tertiaire** : Noir `#1c1c1c`
+- **Gris titane** : `#2B2F34`
+- **Argent métallique** : `#BFC3C9`
+- **Vert racing profond** : `#0F3D2E`
+- **Blanc froid** : `#F2F2F2`
 
 ## Environnement
 

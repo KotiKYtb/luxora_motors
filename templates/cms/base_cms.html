@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}cms{% endblock %} | luxora Motors</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/cms.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="cms-body">
+  <header class="cms-header">
+    <div class="cms-header-inner">
+      <a href="{% url 'cms_vehicule_list' %}" class="cms-logo">cms · luxora Motors</a>
+      <nav class="cms-nav">
+        <a href="{% url 'cms_vehicule_list' %}" {% if request.resolver_match.url_name == 'cms_vehicule_list' or request.resolver_match.url_name == 'cms_vehicule_edit' or request.resolver_match.url_name == 'cms_vehicule_delete' %}class="cms-nav-active"{% endif %}>Véhicules</a>
+        <a href="{% url 'cms_vehicule_create' %}" {% if request.resolver_match.url_name == 'cms_vehicule_create' %}class="cms-nav-active"{% endif %}>Ajouter un véhicule</a>
+        <a href="{% url 'home' %}" target="_blank">Voir le site</a>
+        <a href="{% url 'admin:logout' %}">Déconnexion</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="cms-main">
+    {% if messages %}
+      <ul class="cms-messages">
+        {% for message in messages %}
+          <li class="cms-message cms-message--{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

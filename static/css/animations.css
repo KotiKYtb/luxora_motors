@@ -1,4 +1,4 @@
-/* Luxura Motors - Animations & effets */
+/* luxora Motors - Animations & effets */
 
 /* ========== Keyframes ========== */
 @keyframes fadeUp {
@@ -39,10 +39,10 @@
 /* Lueur pulsée */
 @keyframes glowPulse {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(195, 140, 55, 0.25), 0 0 40px rgba(195, 140, 55, 0.1);
+    box-shadow: 0 0 20px rgba(191, 195, 201, 0.25), 0 0 40px rgba(191, 195, 201, 0.1);
   }
   50% {
-    box-shadow: 0 0 30px rgba(195, 140, 55, 0.4), 0 0 60px rgba(195, 140, 55, 0.15);
+    box-shadow: 0 0 30px rgba(191, 195, 201, 0.4), 0 0 60px rgba(191, 195, 201, 0.15);
   }
 }
 
@@ -77,8 +77,8 @@
 
 /* Border glow */
 @keyframes borderGlow {
-  0%, 100% { border-color: rgba(195, 140, 55, 0.3); box-shadow: 0 0 0 1px rgba(195, 140, 55, 0.2); }
-  50% { border-color: rgba(195, 140, 55, 0.6); box-shadow: 0 0 20px rgba(195, 140, 55, 0.15); }
+  0%, 100% { border-color: rgba(191, 195, 201, 0.3); box-shadow: 0 0 0 1px rgba(191, 195, 201, 0.2); }
+  50% { border-color: rgba(191, 195, 201, 0.6); box-shadow: 0 0 20px rgba(191, 195, 201, 0.15); }
 }
 
 /* ========== Hero background animé ========== */
@@ -88,11 +88,11 @@
   z-index: 0;
   background: linear-gradient(
     135deg,
-    #0e2f28 0%,
-    #153d33 25%,
-    #0e2f28 50%,
-    #0a2520 75%,
-    #0e2f28 100%
+    #0F3D2E 0%,
+    #154a38 25%,
+    #0F3D2E 50%,
+    #082219 75%,
+    #0F3D2E 100%
   );
   background-size: 400% 400%;
   animation: gradientShift 12s ease infinite;
@@ -106,8 +106,8 @@
   left: 10%;
   background: radial-gradient(
     ellipse at center,
-    rgba(195, 140, 55, 0.08) 0%,
-    rgba(195, 140, 55, 0.02) 40%,
+    rgba(191, 195, 201, 0.08) 0%,
+    rgba(191, 195, 201, 0.02) 40%,
     transparent 70%
   );
   pointer-events: none;
@@ -165,9 +165,9 @@
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: 0;
+  : 0;
   padding: 1px;
-  background: linear-gradient(135deg, transparent, rgba(195, 140, 55, 0.2), transparent, rgba(195, 140, 55, 0.1));
+  background: linear-gradient(135deg, transparent, rgba(191, 195, 201, 0.2), transparent, rgba(191, 195, 201, 0.1));
   background-size: 300% 300%;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -187,8 +187,8 @@
 .vehicule-card:hover {
   box-shadow:
     0 24px 48px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(195, 140, 55, 0.15),
-    0 20px 40px rgba(195, 140, 55, 0.08);
+    0 0 0 1px rgba(191, 195, 201, 0.15),
+    0 20px 40px rgba(191, 195, 201, 0.08);
 }
 
 /* Overlay hover — contenu en fade unique */
@@ -218,6 +218,12 @@
 }
 
 .nav-main a:hover::after {
+  width: 100%;
+}
+
+/* Actif = soulignement visible comme au hover ; au survol du lien actif, on garde 100 % (pas d’effet) */
+.nav-main a.nav-main-active::after,
+.nav-main a.nav-main-active:hover::after {
   width: 100%;
 }
 
@@ -258,9 +264,9 @@
   background: linear-gradient(
     110deg,
     transparent 0%,
-    rgba(195, 140, 55, 0.03) 25%,
+    rgba(191, 195, 201, 0.03) 25%,
     transparent 50%,
-    rgba(195, 140, 55, 0.05) 75%,
+    rgba(191, 195, 201, 0.05) 75%,
     transparent 100%
   );
   background-size: 200% 100%;
@@ -281,18 +287,9 @@
   transform: scale(1.05);
 }
 
-/* ========== Footer - effet subtil ========== */
+/* ========== Footer ========== */
 .site-footer {
   position: relative;
-}
-
-.site-footer .logo span {
-  background: linear-gradient(90deg, var(--secondary), var(--secondary-hover));
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: gradientText 4s ease infinite;
 }
 
 /* ========== Page hero (liste véhicules) ========== */
@@ -308,7 +305,7 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(195, 140, 55, 0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(191, 195, 201, 0.4), transparent);
   opacity: 0.6;
 }
 

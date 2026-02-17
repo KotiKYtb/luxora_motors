@@ -25,7 +25,8 @@ SECRET_KEY = 'django-insecure-safvyw-1g-q^2s@vkj$+c80p*kj9^vcqi0xery&&vevhfwh%@z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# En dev : autoriser l'accès via ton IP (ex. 192.168.x.x) pour que ton pote sur le même réseau puisse ouvrir le site.
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "*"]
 
 
 # Application definition
@@ -122,3 +123,7 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 LANGUAGE_CODE = 'fr-fr'
+
+# cms : les staff vont sur /admin/ pour se connecter
+LOGIN_URL = '/admin/login/'
+LOGIN_REDIRECT_URL = '/'

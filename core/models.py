@@ -45,11 +45,33 @@ class Vehicule(models.Model):
         return f"{self.titre} ({self.annee})"
 
 
+class OptionVehicule(models.Model):
+    """Option / équipement du véhicule (liste libre, une entrée par ligne)."""
+
+    vehicule = models.ForeignKey(Vehicule, on_delete=models.CASCADE, related_name="options")
+    libelle = models.CharField(max_length=200, verbose_name="Option")
+    ordre = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["ordre"]
+        verbose_name = "Option véhicule"
+        verbose_name_plural = "Options véhicule"
+
+    def __str__(self):
+        return self.libelle
+
+
 class ImageVehicule(models.Model):
-    """Images supplémentaires pour un véhicule."""
+    """Images supplémentaires pour un véhicule (fichier ou URL)."""
 
     vehicule = models.ForeignKey(Vehicule, on_delete=models.CASCADE, related_name="images")
-    image = models.ImageField(upload_to="vehicules/galerie/")
+    image = models.ImageField(upload_to="vehicules/galerie/", blank=True, null=True)
+    image_url = models.URLField(
+        max_length=500,
+        blank=True,
+        verbose_name="URL image (externe)",
+        help_text="Lien vers une image si pas de fichier uploadé.",
+    )
     legende = models.CharField(max_length=120, blank=True)
     ordre = models.PositiveSmallIntegerField(default=0)
 
@@ -58,3 +80,11 @@ class ImageVehicule(models.Model):
 
     def __str__(self):
         return f"Image {self.ordre} - {self.vehicule.titre}"
+
+    def get_image_display_url(self):
+        """Retourne l'URL à afficher (fichier uploadé ou image_url)."""
+        if self.image:
+            return self.image.url
+        if self.image_url:
+            return self.image_url
+        return None

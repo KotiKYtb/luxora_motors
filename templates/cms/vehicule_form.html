@@ -1,0 +1,425 @@
+{% extends "cms/base_cms.html" %}
+{% load static %}
+{% block title %}{% if vehicule %}Modifier{% else %}Ajouter{% endif %} véhicule{% endblock %}
+
+{% block content %}
+  <div class="cms-page-header">
+    <h1 class="cms-page-title">{% if vehicule %}Modifier le véhicule{% else %}Nouveau véhicule{% endif %}</h1>
+    <a href="{% url 'cms_vehicule_list' %}" class="cms-btn cms-btn-outline">← Retour à la liste</a>
+  </div>
+
+  <div class="cms-form-layout">
+    <div class="cms-form-col">
+      <form method="post" enctype="multipart/form-data" id="cms-vehicule-form" class="cms-form">
+        {% csrf_token %}
+        <div class="cms-fieldset">
+          <h2 class="cms-fieldset-title">Identification</h2>
+          <div class="cms-field">
+            <label for="id_titre">Titre</label>
+            {{ form.titre }}
+            {{ form.titre.errors }}
+          </div>
+          <div class="cms-field">
+            <label for="id_marque">Marque</label>
+            {{ form.marque }}
+            {{ form.marque.errors }}
+          </div>
+          <div class="cms-field">
+            <label for="id_modele">Modèle</label>
+            {{ form.modele }}
+            {{ form.modele.errors }}
+          </div>
+        </div>
+
+        <div class="cms-fieldset">
+          <h2 class="cms-fieldset-title">Caractéristiques</h2>
+          <div class="cms-field-row">
+            <div class="cms-field">
+              <label for="id_annee">Année</label>
+              {{ form.annee }}
+              {{ form.annee.errors }}
+            </div>
+            <div class="cms-field">
+              <label for="id_kilometrage">Kilométrage (km)</label>
+              {{ form.kilometrage }}
+              {{ form.kilometrage.errors }}
+            </div>
+          </div>
+          <div class="cms-field-row">
+            <div class="cms-field">
+              <label for="id_prix">Prix (€)</label>
+              {{ form.prix }}
+              {{ form.prix.errors }}
+            </div>
+            <div class="cms-field">
+              <label for="id_puissance_ch">Puissance (ch)</label>
+              {{ form.puissance_ch }}
+              {{ form.puissance_ch.errors }}
+            </div>
+          </div>
+          <div class="cms-field">
+            <label for="id_moteur">Moteur</label>
+            {{ form.moteur }}
+            {{ form.moteur.errors }}
+          </div>
+          <div class="cms-field">
+            <label for="id_description">Description</label>
+            {{ form.description }}
+            {{ form.description.errors }}
+          </div>
+        </div>
+
+        <div class="cms-fieldset">
+          <h2 class="cms-fieldset-title">Image principale</h2>
+          <div class="cms-field">
+            <label class="cms-field-label">Image principale (fichier)</label>
+            <label class="cms-file-wrap cms-file-wrap--main">
+              <span class="cms-file-label">Choisir un fichier image</span>
+              {{ form.image_principale }}
+            </label>
+            {{ form.image_principale.errors }}
+          </div>
+          <div class="cms-field">
+            <label for="id_image_url">Ou URL image (externe)</label>
+            {{ form.image_url }}
+            {{ form.image_url.errors }}
+          </div>
+        </div>
+
+        <div class="cms-fieldset">
+          <h2 class="cms-fieldset-title">Images secondaires (galerie page détail)</h2>
+          <p class="cms-hint">Ajoutez autant d'images que vous voulez. Elles apparaîtront dans la galerie sur la fiche véhicule. Ordre = ordre d'affichage (0, 1, 2…).</p>
+          <div id="images-formset">
+            {{ images_formset.management_form }}
+            <div id="images-forms-container">
+              {% for f in images_formset %}
+                <div class="cms-image-row" data-formset-form data-existing="{% if f.instance.pk %}true{% else %}false{% endif %}">
+                  {{ f.id }}
+                  {% if images_formset.can_delete %}<span class="cms-delete-hidden">{{ f.DELETE }}</span>{% endif %}
+                  <div class="cms-image-fields">
+                    <div class="cms-image-cell cms-image-inputs">
+                      {% if f.instance.get_image_display_url %}
+                        <div class="cms-image-current">
+                          <img src="{{ f.instance.get_image_display_url }}" alt="" class="cms-thumb-small">
+                          <span>Actuelle</span>
+                        </div>
+                      {% endif %}
+                      <label class="cms-file-wrap">
+                        <span class="cms-file-label">Fichier image</span>
+                        {{ f.image }}
+                      </label>
+                      <span class="cms-image-ou">ou</span>
+                      <div class="cms-image-url-wrap">
+                        {{ f.image_url }}
+                      </div>
+                      {{ f.image.errors }}
+                      {{ f.image_url.errors }}
+                    </div>
+                    {{ f.legende }}
+                    {{ f.ordre }}
+                    {% if images_formset.can_delete %}
+                      <button type="button" class="cms-btn-remove">Retirer</button>
+                    {% endif %}
+                  </div>
+                  {% if f.errors %}<div class="cms-errors">{{ f.errors }}</div>{% endif %}
+                </div>
+              {% endfor %}
+            </div>
+            <div id="image-form-template" style="display:none;">
+              {% with form=images_formset.empty_form %}
+                <div class="cms-image-row" data-formset-form data-existing="false">
+                  {{ form.id }}
+                  {% if images_formset.can_delete %}<span class="cms-delete-hidden">{{ form.DELETE }}</span>{% endif %}
+                  <div class="cms-image-fields">
+                    <div class="cms-image-cell cms-image-inputs">
+                      <label class="cms-file-wrap">
+                        <span class="cms-file-label">Fichier image</span>
+                        {{ form.image }}
+                      </label>
+                      <span class="cms-image-ou">ou</span>
+                      <div class="cms-image-url-wrap">{{ form.image_url }}</div>
+                    </div>
+                    {{ form.legende }}
+                    {{ form.ordre }}
+                    {% if images_formset.can_delete %}
+                      <button type="button" class="cms-btn-remove">Retirer</button>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endwith %}
+            </div>
+            <button type="button" id="add-image-btn" class="cms-btn cms-btn-add">+ Ajouter une image</button>
+          </div>
+        </div>
+
+        <div class="cms-fieldset">
+          <h2 class="cms-fieldset-title">Affichage</h2>
+          <div class="cms-field-row">
+            <div class="cms-field cms-field-check">
+              <label>{{ form.en_vedette }} En vedette (accueil)</label>
+              {{ form.en_vedette.errors }}
+            </div>
+            <div class="cms-field">
+              <label for="id_ordre_affichage">Ordre d'affichage</label>
+              {{ form.ordre_affichage }}
+              {{ form.ordre_affichage.errors }}
+            </div>
+          </div>
+        </div>
+
+        <div class="cms-fieldset">
+          <h2 class="cms-fieldset-title">Options du véhicule</h2>
+          <p class="cms-hint">Liste libre des options / équipements. Cliquez sur « Ajouter une option » pour en ajouter autant que vous voulez.</p>
+          <div id="options-formset">
+            {{ formset.management_form }}
+            <div id="options-forms-container">
+              {% for f in formset %}
+                <div class="cms-option-row" data-formset-form data-existing="{% if f.instance.pk %}true{% else %}false{% endif %}">
+                  {{ f.id }}
+                  {% if formset.can_delete %}<span class="cms-delete-hidden">{{ f.DELETE }}</span>{% endif %}
+                  <div class="cms-option-fields">
+                    {{ f.libelle }}
+                    {{ f.ordre }}
+                    {% if formset.can_delete %}
+                      <button type="button" class="cms-btn-remove">Retirer</button>
+                    {% endif %}
+                  </div>
+                  {% if f.errors %}<div class="cms-errors">{{ f.errors }}</div>{% endif %}
+                </div>
+              {% endfor %}
+            </div>
+            <!-- Modèle de ligne (cloné par JS pour ajouter des options) -->
+            <div id="option-form-template" style="display:none;">
+              {% with form=formset.empty_form %}
+                <div class="cms-option-row" data-formset-form data-existing="false">
+                  {{ form.id }}
+                  {% if formset.can_delete %}<span class="cms-delete-hidden">{{ form.DELETE }}</span>{% endif %}
+                  <div class="cms-option-fields">
+                    {{ form.libelle }}
+                    {{ form.ordre }}
+                    {% if formset.can_delete %}
+                      <button type="button" class="cms-btn-remove">Retirer</button>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endwith %}
+            </div>
+            <button type="button" id="add-option-btn" class="cms-btn cms-btn-add">+ Ajouter une option</button>
+          </div>
+        </div>
+
+        <div class="cms-form-actions">
+          <button type="submit" class="cms-btn cms-btn-primary">Enregistrer</button>
+          <a href="{% url 'cms_vehicule_list' %}" class="cms-btn cms-btn-outline">Annuler</a>
+        </div>
+      </form>
+    </div>
+
+    <div class="cms-preview-col">
+      <div class="cms-preview-sticky">
+        <h2 class="cms-preview-title">Aperçu (temps réel)</h2>
+        <p class="cms-preview-desc">Le rendu ci-dessous correspond à la carte affichée sur la landing.</p>
+        <div class="cms-preview-card-wrap">
+          <article class="vehicule-card cms-preview-card" id="cms-preview-card">
+            <div class="vehicule-card-link">
+              <div class="card-image-wrap">
+                <img id="cms-preview-img" src="{% if vehicule %}{% if vehicule.image_principale %}{{ vehicule.image_principale.url }}{% elif vehicule.image_url %}{{ vehicule.image_url }}{% else %}https://placehold.co/600x375/2B2F34/BFC3C9?text={{ vehicule.modele|urlencode }}{% endif %}{% else %}https://placehold.co/600x375/2B2F34/BFC3C9?text=Modele{% endif %}" alt="">
+                <span class="card-badge" id="cms-preview-marque">—</span>
+                <div class="card-specs-overlay">
+                  <div class="card-specs-overlay-inner">
+                    <p class="card-specs-line-overlay" id="cms-preview-specs-overlay">—</p>
+                    <p class="card-specs-price-overlay" id="cms-preview-price-overlay">— €</p>
+                    <span class="card-specs-cta">Découvrir</span>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <h3 class="card-title" id="cms-preview-title">Titre du véhicule</h3>
+                <p class="card-marque" id="cms-preview-marque-body">—</p>
+                <p class="card-specs-line" id="cms-preview-specs">—</p>
+                <ul class="card-options-list" id="cms-preview-options"></ul>
+                <span class="card-cta">Découvrir</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      var MARQUES = {{ marques_json|safe }};
+      var form = document.getElementById('cms-vehicule-form');
+      var initialImageUrl = '{% if vehicule %}{% if vehicule.image_principale %}{{ vehicule.image_principale.url }}{% elif vehicule.image_url %}{{ vehicule.image_url }}{% endif %}{% endif %}'.trim();
+
+      function num(v) {
+        var n = parseInt(v, 10);
+        return isNaN(n) ? 0 : n;
+      }
+      function formatNum(v) {
+        return num(v).toLocaleString('fr-FR');
+      }
+
+      function updatePreview() {
+        var titre = (form.titre && form.titre.value) || 'Titre du véhicule';
+        var marqueKey = (form.marque && form.marque.value) || '';
+        var marqueLabel = MARQUES[marqueKey] || '—';
+        var annee = (form.annee && form.annee.value) || '—';
+        var km = (form.kilometrage && form.kilometrage.value) || '0';
+        var prix = (form.prix && form.prix.value) || '0';
+        var ch = (form.puissance_ch && form.puissance_ch.value) || '';
+        var modele = (form.modele && form.modele.value) || '';
+
+        document.getElementById('cms-preview-title').textContent = titre;
+        document.getElementById('cms-preview-marque').textContent = marqueLabel;
+        document.getElementById('cms-preview-marque-body').textContent = marqueLabel;
+
+        var specsOverlay = annee + ' · ' + formatNum(km) + ' km';
+        if (ch) specsOverlay += ' · ' + ch + ' ch';
+        document.getElementById('cms-preview-specs-overlay').textContent = specsOverlay;
+        document.getElementById('cms-preview-price-overlay').textContent = formatNum(prix) + ' €';
+        document.getElementById('cms-preview-specs').innerHTML = annee + ' · ' + formatNum(km) + ' km · <strong>' + formatNum(prix) + ' €</strong>';
+
+        // Options
+        var optionInputs = form.querySelectorAll('input[name$="-libelle"]');
+        var options = [];
+        for (var i = 0; i < optionInputs.length; i++) {
+          var val = optionInputs[i].value.trim();
+          if (val) options.push(val);
+        }
+        var optionsEl = document.getElementById('cms-preview-options');
+        optionsEl.innerHTML = '';
+        options.forEach(function(opt) {
+          var li = document.createElement('li');
+          li.textContent = opt;
+          optionsEl.appendChild(li);
+        });
+
+        // Image
+        var imgEl = document.getElementById('cms-preview-img');
+        if (form.image_principale && form.image_principale.files && form.image_principale.files[0]) {
+          var fr = new FileReader();
+          fr.onload = function() { imgEl.src = fr.result; };
+          fr.readAsDataURL(form.image_principale.files[0]);
+        } else if (form.image_url && form.image_url.value.trim()) {
+          imgEl.src = form.image_url.value.trim();
+        } else if (initialImageUrl) {
+          imgEl.src = initialImageUrl;
+        } else {
+          imgEl.src = 'https://placehold.co/600x375/2B2F34/BFC3C9?text=' + encodeURIComponent(modele || 'Image');
+        }
+      }
+
+      if (form) {
+        ['input', 'change', 'keyup'].forEach(function(ev) {
+          form.addEventListener(ev, updatePreview);
+        });
+        updatePreview();
+      }
+
+      // Ajouter autant d'options que souhaité
+      var addOptionBtn = document.getElementById('add-option-btn');
+      var optionsContainer = document.getElementById('options-forms-container');
+      var optionTemplate = document.getElementById('option-form-template');
+      var optionsFormset = document.getElementById('options-formset');
+      var totalOptionInput = optionsFormset && optionsFormset.querySelector('input[name$="TOTAL_FORMS"]');
+
+      if (addOptionBtn && optionsContainer && optionTemplate && totalOptionInput) {
+        addOptionBtn.addEventListener('click', function() {
+          var total = parseInt(totalOptionInput.value, 10) || 0;
+          var clone = optionTemplate.querySelector('.cms-option-row').cloneNode(true);
+          clone.setAttribute('data-existing', 'false');
+          function replacePrefix(node) {
+            if (node.id) node.id = node.id.replace(/__prefix__/g, total);
+            if (node.name) node.name = node.name.replace(/__prefix__/g, total);
+            if (node.getAttribute('for')) node.setAttribute('for', node.getAttribute('for').replace(/__prefix__/g, total));
+            var i, children = node.childNodes || [];
+            for (i = 0; i < children.length; i++) replacePrefix(children[i]);
+          }
+          replacePrefix(clone);
+          clone.querySelectorAll('input').forEach(function(inp) {
+            if (inp.type !== 'hidden') inp.value = '';
+            if (inp.type === 'checkbox') inp.checked = false;
+          });
+          optionsContainer.appendChild(clone);
+          totalOptionInput.value = total + 1;
+          updatePreview();
+        });
+      }
+
+      // Ajouter autant d'images secondaires que souhaité
+      var addImageBtn = document.getElementById('add-image-btn');
+      var imagesContainer = document.getElementById('images-forms-container');
+      var imageTemplate = document.getElementById('image-form-template');
+      var imagesFormsetEl = document.getElementById('images-formset');
+      var totalImageInput = imagesFormsetEl && imagesFormsetEl.querySelector('input[name$="TOTAL_FORMS"]');
+
+      if (addImageBtn && imagesContainer && imageTemplate && totalImageInput) {
+        addImageBtn.addEventListener('click', function() {
+          var total = parseInt(totalImageInput.value, 10) || 0;
+          var clone = imageTemplate.querySelector('.cms-image-row').cloneNode(true);
+          clone.setAttribute('data-existing', 'false');
+          function replacePrefix(node) {
+            if (node.id) node.id = node.id.replace(/__prefix__/g, total);
+            if (node.name) node.name = node.name.replace(/__prefix__/g, total);
+            if (node.getAttribute('for')) node.setAttribute('for', node.getAttribute('for').replace(/__prefix__/g, total));
+            var i, children = node.childNodes || [];
+            for (i = 0; i < children.length; i++) replacePrefix(children[i]);
+          }
+          replacePrefix(clone);
+          clone.querySelectorAll('input').forEach(function(inp) {
+            if (inp.type !== 'hidden') inp.value = '';
+            if (inp.type === 'checkbox') inp.checked = false;
+          });
+          imagesContainer.appendChild(clone);
+          totalImageInput.value = total + 1;
+        });
+      }
+
+      // Bouton Retirer : ligne existante = cocher DELETE et masquer ; nouvelle ligne = supprimer du DOM et renuméroter les indices
+      function renumberFormset(container, totalInput) {
+        var rows = Array.prototype.slice.call(container.querySelectorAll('.cms-option-row, .cms-image-row'));
+        var visible = rows.filter(function(row) { return row.style.display !== 'none'; });
+        var prefix = null;
+        visible.forEach(function(row, newIndex) {
+          var firstInput = row.querySelector('input[name], select[name]');
+          if (!firstInput || !firstInput.name) return;
+          var m = firstInput.name.match(/^(.+)-(\d+)-/);
+          if (!m) return;
+          if (prefix === null) prefix = m[1];
+          var oldIndex = m[2];
+          if (oldIndex === String(newIndex)) return;
+          row.querySelectorAll('input, select, textarea').forEach(function(el) {
+            if (el.name) el.name = el.name.replace(new RegExp('^' + prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '-\\d+-'), prefix + '-' + newIndex + '-');
+            if (el.id) el.id = el.id.replace(new RegExp('-' + oldIndex + '-'), '-' + newIndex + '-');
+          });
+        });
+        if (totalInput && prefix) totalInput.value = visible.length;
+      }
+
+      form.addEventListener('click', function(e) {
+        var btn = e.target && e.target.classList && e.target.classList.contains('cms-btn-remove') ? e.target : null;
+        if (!btn) return;
+        var row = btn.closest('.cms-option-row') || btn.closest('.cms-image-row');
+        if (!row) return;
+        e.preventDefault();
+        var isExisting = row.getAttribute('data-existing') === 'true';
+        if (isExisting) {
+          var deleteInput = row.querySelector('input[name$="-DELETE"]');
+          if (deleteInput) {
+            deleteInput.checked = true;
+            row.style.display = 'none';
+          }
+        } else {
+          var container = row.parentNode;
+          var formsetEl = container.closest('#options-formset') || container.closest('#images-formset');
+          var totalInput = formsetEl && formsetEl.querySelector('input[name$="TOTAL_FORMS"]');
+          row.remove();
+          if (container && totalInput) renumberFormset(container, totalInput);
+          if (container && container.id === 'options-forms-container') updatePreview();
+        }
+      });
+    })();
+  </script>
+{% endblock %}
