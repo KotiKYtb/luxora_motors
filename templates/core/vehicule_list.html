@@ -9,8 +9,86 @@
     <p class="page-hero-desc gsap-fade-up">Véhicules d'exception — visite sur rendez-vous</p>
   </div>
 
-  <section class="section">
-    <div class="vehicules-grid">
+  <div class="filters-wrap" id="filters-wrap">
+    <button type="button" class="filters-toggle" id="filters-toggle" aria-expanded="true" aria-controls="filters-collapsible">
+      <span class="filters-toggle-text">Filtres</span>
+      <svg class="filters-toggle-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="filters-collapsible" id="filters-collapsible">
+    <form method="get" action="{% url 'vehicule_list' %}" class="filters-form" id="filters-form">
+      <div class="filters-row">
+        <div class="filter-group filter-group-marques">
+          <span class="filter-label">Marque</span>
+          <div class="filter-dropdown" id="marque-dropdown">
+            <button type="button" class="filter-dropdown-trigger" id="marque-dropdown-trigger" aria-expanded="false" aria-haspopup="listbox" aria-label="Choisir les marques">
+              <span class="filter-dropdown-value" id="marque-dropdown-value">
+                {% if filters.marque %}
+                  {% for value, label in marques %}{% if value in filters.marque %}{{ label }}{% if not forloop.last %}, {% endif %}{% endif %}{% endfor %}
+                {% else %}
+                  Toutes les marques
+                {% endif %}
+              </span>
+              <svg class="filter-dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="filter-dropdown-panel" id="marque-dropdown-panel" role="listbox" aria-multiselectable="true" aria-hidden="true">
+              {% for value, label in marques %}
+                <label class="filter-dropdown-option">
+                  <input type="checkbox" name="marque" value="{{ value }}" {% if value in filters.marque %}checked{% endif %} class="filter-dropdown-checkbox" data-label="{{ label }}">
+                  <span class="filter-dropdown-option-text">{{ label }}</span>
+                </label>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <div class="filter-group">
+          <label for="f-annee-min" class="filter-label">Année</label>
+          <div class="filter-range">
+            <input type="number" id="f-annee-min" name="annee_min" value="{{ filters.annee_min }}" placeholder="Min" min="1990" max="2030" class="filter-input filter-input-sm">
+            <span class="filter-range-sep">→</span>
+            <input type="number" id="f-annee-max" name="annee_max" value="{{ filters.annee_max }}" placeholder="Max" min="1990" max="2030" class="filter-input filter-input-sm">
+          </div>
+        </div>
+        <div class="filter-group">
+          <label for="f-prix-min" class="filter-label">Prix (€)</label>
+          <div class="filter-range">
+            <input type="number" id="f-prix-min" name="prix_min" value="{{ filters.prix_min }}" placeholder="Min" min="0" step="10000" class="filter-input filter-input-sm">
+            <span class="filter-range-sep">→</span>
+            <input type="number" id="f-prix-max" name="prix_max" value="{{ filters.prix_max }}" placeholder="Max" min="0" step="10000" class="filter-input filter-input-sm">
+          </div>
+        </div>
+        <div class="filter-group">
+          <label for="f-km-max" class="filter-label">Kilométrage max (km)</label>
+          <input type="number" id="f-km-max" name="km_max" value="{{ filters.km_max }}" placeholder="Ex. 50000" min="0" step="5000" class="filter-input filter-input-sm">
+        </div>
+        <div class="filter-group filter-group-tri">
+          <span class="filter-label">Trier par</span>
+          <div class="filter-dropdown filter-dropdown-tri" id="tri-dropdown">
+            <input type="hidden" name="tri" id="tri-value" value="{{ filters.tri }}">
+            <button type="button" class="filter-dropdown-trigger filter-dropdown-trigger-tri" id="tri-dropdown-trigger" aria-expanded="false" aria-haspopup="listbox" aria-label="Choisir le tri">
+              <span class="filter-dropdown-value" id="tri-dropdown-value">{% if filters.tri == 'recent' %}Plus récents{% elif filters.tri == 'prix_asc' %}Prix croissant{% elif filters.tri == 'prix_desc' %}Prix décroissant{% elif filters.tri == 'annee_desc' %}Année récente{% elif filters.tri == 'annee_asc' %}Année ancienne{% elif filters.tri == 'km_asc' %}Kilométrage croissant{% else %}Plus récents{% endif %}</span>
+              <svg class="filter-dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="filter-dropdown-panel filter-dropdown-panel-tri" id="tri-dropdown-panel" role="listbox" aria-hidden="true">
+              <button type="button" class="filter-dropdown-option filter-dropdown-option-tri" role="option" data-value="recent" {% if filters.tri == 'recent' %}aria-selected="true"{% endif %}>Plus récents</button>
+              <button type="button" class="filter-dropdown-option filter-dropdown-option-tri" role="option" data-value="prix_asc" {% if filters.tri == 'prix_asc' %}aria-selected="true"{% endif %}>Prix croissant</button>
+              <button type="button" class="filter-dropdown-option filter-dropdown-option-tri" role="option" data-value="prix_desc" {% if filters.tri == 'prix_desc' %}aria-selected="true"{% endif %}>Prix décroissant</button>
+              <button type="button" class="filter-dropdown-option filter-dropdown-option-tri" role="option" data-value="annee_desc" {% if filters.tri == 'annee_desc' %}aria-selected="true"{% endif %}>Année récente</button>
+              <button type="button" class="filter-dropdown-option filter-dropdown-option-tri" role="option" data-value="annee_asc" {% if filters.tri == 'annee_asc' %}aria-selected="true"{% endif %}>Année ancienne</button>
+              <button type="button" class="filter-dropdown-option filter-dropdown-option-tri" role="option" data-value="km_asc" {% if filters.tri == 'km_asc' %}aria-selected="true"{% endif %}>Kilométrage croissant</button>
+            </div>
+          </div>
+        </div>
+        <div class="filter-actions">
+          <button type="button" class="btn btn-primary btn-filters" id="btn-filters-apply">Filtrer</button>
+          <a href="{% url 'vehicule_list' %}" class="btn btn-outline btn-filters-reset">Réinitialiser</a>
+        </div>
+      </div>
+    </form>
+    </div>
+  </div>
+
+  <section class="section section-vehicules-ajax" id="vehicules-section">
+    <div class="vehicules-grid" id="vehicules-grid">
       {% for v in vehicules %}
         <article class="vehicule-card card-reveal">
           <a href="{% url 'vehicule_detail' v.pk %}" class="vehicule-card-link">
@@ -51,6 +129,10 @@
           Aucun véhicule pour le moment.
         </p>
       {% endfor %}
+    </div>
+    <div class="vehicules-loading" id="vehicules-loading" aria-hidden="true">
+      <span class="vehicules-loading-spinner"></span>
+      <span class="vehicules-loading-text">Chargement…</span>
     </div>
   </section>
 {% endblock %}

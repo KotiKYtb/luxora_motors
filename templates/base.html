@@ -21,16 +21,30 @@
         <img src="{% static 'img/logo.png' %}" alt="" class="logo-img" width="48" height="48">
         <!-- <span>luxora<span class="logo-amp"> </span><span>Motors</span></span> -->
       </a>
-      <nav class="nav-main">
+      <nav class="nav-main" aria-label="Navigation principale">
         <a href="{% url 'home' %}" {% if request.resolver_match.url_name == 'home' %}class="nav-main-active"{% endif %}>Accueil</a>
         <a href="{% url 'vehicule_list' %}" {% if request.resolver_match.url_name == 'vehicule_list' or request.resolver_match.url_name == 'vehicule_detail' %}class="nav-main-active"{% endif %}>À vendre</a>
         <a href="{% url 'contact' %}" {% if request.resolver_match.url_name == 'contact' %}class="nav-main-active"{% endif %}>Contact</a>
       </nav>
       <div class="header-right">
         <a href="{% url 'contact' %}" class="cta-header">Rendez-vous</a>
+        <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="nav-mobile">
+          <span class="nav-toggle-bar nav-toggle-bar-1"></span>
+          <span class="nav-toggle-bar nav-toggle-bar-2"></span>
+          <span class="nav-toggle-bar nav-toggle-bar-3"></span>
+        </button>
       </div>
     </div>
   </header>
+  <div class="nav-overlay" id="nav-overlay" aria-hidden="true"></div>
+  <div class="nav-mobile" id="nav-mobile" aria-hidden="true">
+    <nav class="nav-mobile-inner" aria-label="Menu mobile">
+      <a href="{% url 'home' %}" class="nav-mobile-link {% if request.resolver_match.url_name == 'home' %}nav-mobile-link-active{% endif %}">Accueil</a>
+      <a href="{% url 'vehicule_list' %}" class="nav-mobile-link {% if request.resolver_match.url_name == 'vehicule_list' or request.resolver_match.url_name == 'vehicule_detail' %}nav-mobile-link-active{% endif %}">À vendre</a>
+      <a href="{% url 'contact' %}" class="nav-mobile-link {% if request.resolver_match.url_name == 'contact' %}nav-mobile-link-active{% endif %}">Contact</a>
+      <a href="{% url 'contact' %}" class="nav-mobile-cta">Rendez-vous</a>
+    </nav>
+  </div>
 
   <main>
     {% block content %}{% endblock %}

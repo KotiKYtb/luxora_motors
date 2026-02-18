@@ -23,9 +23,85 @@ def home(request):
 
 
 def vehicule_list(request):
-    """Liste de tous les véhicules."""
-    vehicules = Vehicule.objects.all().prefetch_related("options")
-    return render(request, "core/vehicule_list.html", {"vehicules": vehicules})
+    """Liste des véhicules avec filtres (marque, année, prix, kilométrage, tri)."""
+    qs = Vehicule.objects.all().prefetch_related("options")
+
+    # Filtres GET
+    marque = request.GET.getlist("marque")  # plusieurs marques possibles
+    annee_min = request.GET.get("annee_min", "").strip()
+    annee_max = request.GET.get("annee_max", "").strip()
+    prix_min = request.GET.get("prix_min", "").strip()
+    prix_max = request.GET.get("prix_max", "").strip()
+    km_max = request.GET.get("km_max", "").strip()
+    tri = request.GET.get("tri", "recent")
+
+    if marque:
+        qs = qs.filter(marque__in=marque)
+    def _parse_int(s):
+        if not s or not isinstance(s, str):
+            return None
+        s = s.strip().replace(" ", "").replace(",", ".").replace("\u202f", "")
+        if not s:
+            return None
+        try:
+            return int(float(s))
+        except (ValueError, TypeError):
+            return None
+
+    if annee_min:
+        val = _parse_int(annee_min)
+        if val is not None:
+            qs = qs.filter(annee__gte=val)
+    if annee_max:
+        val = _parse_int(annee_max)
+        if val is not None:
+            qs = qs.filter(annee__lte=val)
+    if prix_min:
+        val = _parse_int(prix_min)
+        if val is not None:
+            qs = qs.filter(prix__gte=val)
+    if prix_max:
+        val = _parse_int(prix_max)
+        if val is not None:
+            qs = qs.filter(prix__lte=val)
+    if km_max:
+        val = _parse_int(km_max)
+        if val is not None:
+            qs = qs.filter(kilometrage__lte=val)
+
+    if tri == "prix_asc":
+        qs = qs.order_by("prix")
+    elif tri == "prix_desc":
+        qs = qs.order_by("-prix")
+    elif tri == "annee_desc":
+        qs = qs.order_by("-annee")
+    elif tri == "annee_asc":
+        qs = qs.order_by("annee")
+    elif tri == "km_asc":
+        qs = qs.order_by("kilometrage")
+    else:
+        qs = qs.order_by("-ordre_affichage", "-created_at")
+
+    context = {
+        "vehicules": qs,
+        "marques": Vehicule.MARQUES,
+        "filters": {
+            "marque": marque,
+            "annee_min": annee_min,
+            "annee_max": annee_max,
+            "prix_min": prix_min,
+            "prix_max": prix_max,
+            "km_max": km_max,
+            "tri": tri,
+        },
+    }
+    is_ajax = (
+        request.GET.get("ajax") == "1"
+        or request.headers.get("X-Requested-With") == "XMLHttpRequest"
+    )
+    if is_ajax:
+        return render(request, "core/vehicule_list_partial.html", context)
+    return render(request, "core/vehicule_list.html", context)
 
 
 def vehicule_detail(request, pk):

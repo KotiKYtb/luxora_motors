@@ -1,0 +1,41 @@
+{% load static %}
+{% for v in vehicules %}
+  <article class="vehicule-card card-reveal">
+    <a href="{% url 'vehicule_detail' v.pk %}" class="vehicule-card-link">
+      <div class="card-image-wrap">
+        {% if v.image_principale %}
+          <img src="{{ v.image_principale.url }}" alt="{{ v.titre }}" loading="lazy">
+        {% elif v.image_url %}
+          <img src="{{ v.image_url }}" alt="{{ v.titre }}" loading="lazy">
+        {% else %}
+          <img src="https://placehold.co/600x375/2B2F34/BFC3C9?text={{ v.modele|urlencode }}" alt="{{ v.titre }}" loading="lazy">
+        {% endif %}
+        <span class="card-badge">{{ v.get_marque_display }}</span>
+        <div class="card-specs-overlay">
+          <div class="card-specs-overlay-inner">
+            <p class="card-specs-line-overlay">{{ v.annee }} · {{ v.kilometrage|floatformat:0 }} km{% if v.puissance_ch %} · {{ v.puissance_ch }} ch{% endif %}</p>
+            <p class="card-specs-price-overlay">{{ v.prix|floatformat:0 }} €</p>
+            <span class="card-specs-cta">Découvrir</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">{{ v.titre }}</h3>
+        <p class="card-marque">{{ v.get_marque_display }}</p>
+        <p class="card-specs-line">{{ v.annee }} · {{ v.kilometrage|floatformat:0 }} km · <strong>{{ v.prix|floatformat:0 }} €</strong></p>
+        {% if v.options.exists %}
+          <ul class="card-options-list">
+            {% for opt in v.options.all %}
+              <li>{{ opt.libelle }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        <span class="card-cta">Découvrir</span>
+      </div>
+    </a>
+  </article>
+{% empty %}
+  <p class="text-center vehicules-empty" style="grid-column: 1/-1; color: var(--text-muted);">
+    Aucun véhicule ne correspond à vos critères.
+  </p>
+{% endfor %}
