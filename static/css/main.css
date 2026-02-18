@@ -60,6 +60,27 @@
 html {
   font-size: 14px;
   scroll-behavior: smooth;
+  /* Scrollbar personnalisée — WebKit (Chrome, Safari, Edge) */
+  scrollbar-color: var(--secondary) var(--primary);
+  scrollbar-width: thin;
+}
+
+/* Scrollbar WebKit */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--tertiary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--secondary);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-hover);
 }
 
 body {
@@ -86,6 +107,7 @@ img {
   height: auto;
   display: block;
 }
+
 
 /* ----- Header — transparent pour que la vidéo s’incruste sur toute la barre ----- */
 .site-header {
