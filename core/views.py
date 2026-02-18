@@ -1,10 +1,19 @@
 import json
+import os
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 
-from .models import Vehicule
-from .forms import VehiculeForm, OptionVehiculeFormSet, ImageVehiculeFormSet
+from .models import Vehicule, RendezVous, RendezVousFichier
+from .forms import (
+    VehiculeForm,
+    OptionVehiculeFormSet,
+    ImageVehiculeFormSet,
+    RendezVousForm,
+    CONTACT_ALLOWED_EXTENSIONS,
+    CONTACT_MAX_FILE_SIZE,
+    CONTACT_MAX_FILES,
+)
 
 
 def home(request):
@@ -21,11 +30,37 @@ def vehicule_list(request):
 
 def vehicule_detail(request, pk):
     """Détail d'un véhicule (pas de bouton achat, contact/RDV uniquement)."""
+    from django.templatetags.static import static
+
     vehicule = get_object_or_404(
         Vehicule.objects.prefetch_related("options", "images"),
         pk=pk,
     )
-    return render(request, "core/vehicule_detail.html", {"vehicule": vehicule})
+    marque_image_url = static("img/marque/%s.png" % vehicule.marque)
+    return render(
+        request,
+        "core/vehicule_detail.html",
+        {"vehicule": vehicule, "marque_image_url": marque_image_url},
+    )
+
+
+def contact(request):
+    """Page contact avec formulaire de prise de rendez-vous (nom, prénom, mail, tél, raison, message, pièces jointes)."""
+    form = RendezVousForm(request.POST or None, request.FILES or None, request=request)
+    if request.method == "POST" and form.is_valid():
+        rdv = form.save()
+        # Enregistrer les pièces jointes (validation déjà faite dans le form)
+        count = 0
+        for f in request.FILES.getlist("fichiers"):
+            if count >= CONTACT_MAX_FILES:
+                break
+            ext = os.path.splitext(getattr(f, "name", "") or "")[1].lower()
+            if ext in CONTACT_ALLOWED_EXTENSIONS and f.size <= CONTACT_MAX_FILE_SIZE:
+                RendezVousFichier.objects.create(rendez_vous=rdv, fichier=f)
+                count += 1
+        messages.success(request, "Votre demande de rendez-vous a bien été envoyée. Nous vous recontacterons rapidement.")
+        return redirect("contact")
+    return render(request, "core/contact.html", {"form": form})
 
 
 # ---------- cms (réservé aux utilisateurs staff, connexion via /admin/) ----------

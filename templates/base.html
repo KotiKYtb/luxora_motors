@@ -16,14 +16,17 @@
 <body class="{% block body_class %}{% endblock %}">
   <header class="site-header" id="header">
     <div class="header-inner">
-      <a href="{% url 'home' %}" class="logo">luxora<span class="logo-amp"> </span><span>Motors</span></a>
+      <a href="{% url 'home' %}" class="logo">
+        <img src="{% static 'img/logo.png' %}" alt="" class="logo-img" width="48" height="48">
+        <!-- <span>luxora<span class="logo-amp"> </span><span>Motors</span></span> -->
+      </a>
       <nav class="nav-main">
         <a href="{% url 'home' %}" {% if request.resolver_match.url_name == 'home' %}class="nav-main-active"{% endif %}>Accueil</a>
         <a href="{% url 'vehicule_list' %}" {% if request.resolver_match.url_name == 'vehicule_list' or request.resolver_match.url_name == 'vehicule_detail' %}class="nav-main-active"{% endif %}>À vendre</a>
-        <a href="#contact">Contact</a>
+        <a href="{% url 'contact' %}" {% if request.resolver_match.url_name == 'contact' %}class="nav-main-active"{% endif %}>Contact</a>
       </nav>
       <div class="header-right">
-        <a href="#contact" class="cta-header">Rendez-vous</a>
+        <a href="{% url 'contact' %}" class="cta-header">Rendez-vous</a>
       </div>
     </div>
   </header>
@@ -35,11 +38,11 @@
   <section class="contact-strip" id="contact">
     <div class="contact-strip-inner">
       <h2 class="contact-strip-title">Un véhicule vous intéresse ?</h2>
-      <p class="contact-strip-desc">Visite et essai uniquement sur rendez-vous. Contactez-nous par téléphone ou pour planifier une visite.</p>
+      <p class="contact-strip-desc">Visite et essai uniquement sur rendez-vous. Contactez-nous par téléphone ou <a href="{% url 'contact' %}">demandez un rendez-vous en ligne</a>.</p>
       <div class="contact-methods">
         <a href="tel:+33000000000">📞 00 00 00 00 00</a>
         <span class="sep"></span>
-        <span>Sur rendez-vous uniquement</span>
+        <a href="{% url 'contact' %}" class="btn btn-primary btn-shine">Prendre rendez-vous</a>
       </div>
     </div>
   </section>
@@ -48,7 +51,10 @@
     <div class="footer-accent"></div>
     <div class="footer-inner">
       <div class="footer-brand">
-        <a href="{% url 'home' %}" class="footer-logo">luxora<span>Motors</span></a>
+        <a href="{% url 'home' %}" class="footer-logo">
+          <img src="{% static 'img/logo.png' %}" alt="" class="footer-logo-img" width="28" height="28">
+          <span>luxora<span>Motors</span></span>
+        </a>
         <p class="footer-tagline">luxora Motors propose une sélection de véhicules d'exception et une équipe dédiée pour vous accompagner. Nous nous chargeons de a à z de la vente de votre véhicule, ou de votre futur achat. De la création des annonces, la mise en ligne sur différentes plateformes, la mise en relation et la finalisation de la vente, nous nous chargeons de tout. Visite et essai sur rendez-vous uniquement.</p>
       </div>
       <div class="footer-showrooms">

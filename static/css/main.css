@@ -48,7 +48,7 @@
   /* Ligne d'accent (signature visuelle) */
   --accent-width: 3px;
   /* Hauteur header (vidéo commence en dessous) */
-  --header-height: 72px;
+  --header-height: 88px;
 }
 
 *,
@@ -87,16 +87,35 @@ img {
   display: block;
 }
 
-/* ----- Header — une seule navbar, même rendu partout ----- */
+/* ----- Header — transparent pour que la vidéo s’incruste sur toute la barre ----- */
 .site-header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 100;
-  padding: var(--space-md) var(--space-xl);
-  background: var(--primary);
-  border-bottom: 1px solid rgba(191, 195, 201, 0.15);
+  height: var(--header-height);
+  padding: 0 var(--space-xl);
+  display: flex;
+  align-items: center;
+}
+
+.site-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    to bottom,
+    rgba(15, 61, 46, 0.92) 0%,
+    rgba(15, 61, 46, 0.82) 50%,
+    rgba(15, 61, 46, 0.5) 85%,
+    rgba(15, 61, 46, 0.2) 100%
+  );
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 82%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 0%, black 82%, transparent 100%);
 }
 
 .header-inner {
@@ -106,9 +125,13 @@ img {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-xl);
+  width: 100%;
 }
 
 .logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   font-family: var(--font-display);
   font-size: 1.5rem;
   font-weight: 600;
@@ -120,7 +143,24 @@ img {
   flex-shrink: 0;
 }
 
+.logo-img {
+  display: block;
+  height: 64px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
 .logo span {
+  color: var(--secondary);
+  font-weight: 500;
+}
+
+.logo > span {
+  color: inherit;
+}
+
+.logo > span span {
   color: var(--secondary);
   font-weight: 500;
 }
@@ -208,13 +248,10 @@ img {
   overflow: hidden;
 }
 
-/* Vidéo locale en fond — commence sous la nav */
+/* Vidéo en fond plein écran, derrière la nav */
 .hero-video-wrap {
   position: absolute;
-  top: var(--header-height);
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
@@ -233,23 +270,24 @@ img {
 }
 
 /* Overlay vert au-dessus de la vidéo */
+/* Overlay vert plein écran (passe derrière la nav), dégradé vers le bas */
 .hero-video-overlay {
   position: absolute;
-  top: var(--header-height);
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   z-index: 1;
-  background: rgba(15, 61, 46, 0.7);
+  background: linear-gradient(
+    180deg,
+    rgba(15, 61, 46, 0.25) 0%,
+    rgba(15, 61, 46, 0.5) 40%,
+    rgba(15, 61, 46, 0.7) 100%
+  );
   pointer-events: none;
 }
 
+/* Fond de secours (sans vidéo) — plein écran */
 .hero-bg {
   position: absolute;
-  top: var(--header-height);
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: radial-gradient(ellipse 85% 70% at 50% 45%, var(--primary-light) 0%, var(--primary) 45%, var(--primary-dark) 100%);
   z-index: -1;
   pointer-events: none;
@@ -406,7 +444,7 @@ img {
 
 /* ----- Sections — divider signature ----- */
 .section {
-  padding: var(--space-3xl) var(--space-xl);
+  padding: var(--space-xl);
   max-width: 1320px;
   margin: 0 auto;
 }
@@ -772,18 +810,37 @@ img {
 }
 
 .footer-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
   font-family: var(--font-display);
   font-size: 1.75rem;
   font-weight: 600;
   color: var(--text);
   text-decoration: none;
   letter-spacing: 0.02em;
-  display: inline-block;
   margin-bottom: var(--space-md);
   transition: color 0.25s ease;
 }
 
+.footer-logo-img {
+  display: block;
+  height: 28px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
 .footer-logo span {
+  color: var(--secondary);
+  font-weight: 500;
+}
+
+.footer-logo > span {
+  color: inherit;
+}
+
+.footer-logo > span span {
   color: var(--secondary);
   font-weight: 500;
 }
@@ -1037,20 +1094,21 @@ img {
   }
 }
 
-/* ----- Galerie gauche (détail véhicule) — refonte complète ----- */
+/* ----- Galerie gauche (détail véhicule) — hauteur réduite, image en entier ----- */
 .vd-gallery {
   position: sticky;
   top: 6rem;
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
-/* Cadre image principale */
+/* Cadre image principale : hauteur de la box fixe (16:9), image toute la largeur */
 .vd-gallery-main {
   position: relative;
   width: 100%;
   max-width: 100%;
+  max-height: 320px;
   background: var(--primary-dark);
   border: 1px solid rgba(242, 242, 242, 0.1);
   overflow: hidden;
@@ -1058,9 +1116,10 @@ img {
 
 .vd-gallery-main-inner {
   position: relative;
-  display: block;
   line-height: 0;
-  aspect-ratio: 4 / 3;
+  width: 100%;
+  max-height: 320px;
+  aspect-ratio: 16 / 9;
   background: var(--primary-dark);
 }
 
@@ -1068,6 +1127,7 @@ img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   display: block;
   transition: opacity 0.3s ease;
 }
@@ -1097,8 +1157,8 @@ img {
 
 .vd-gallery-nav {
   flex-shrink: 0;
-  width: 48px;
-  min-height: 72px;
+  width: 40px;
+  min-height: 56px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1152,8 +1212,8 @@ img {
 /* Miniature */
 .vd-thumb {
   flex-shrink: 0;
-  width: 100px;
-  height: 68px;
+  width: 88px;
+  height: 58px;
   padding: 0;
   border: 1px solid rgba(242, 242, 242, 0.12);
   background: var(--primary-dark);
@@ -1186,7 +1246,11 @@ img {
   gap: 0;
 }
 
+/* Taille/position du logo marque : modifier --vd-marque-size (ex. 40%, 70%, 180px), --vd-marque-x, --vd-marque-y ou les passer depuis la vue (marque_logo_size, marque_logo_x, marque_logo_y). */
 .vd-content-card {
+  --vd-marque-size: 45%;
+  --vd-marque-x: 95%;
+  --vd-marque-y: -10%;
   background: rgba(21, 74, 56, 0.4);
   border: 1px solid rgba(242, 242, 242, 0.08);
   padding: var(--space-2xl);
@@ -1194,6 +1258,38 @@ img {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
+}
+
+/* Bloc au-dessus des specs : fond avec logo marque (n&b, opacité 0.3).
+   Le header déborde du padding de la carte pour que le logo aille jusqu’au bord de la box. */
+
+.vd-content-card-header {
+  position: relative;
+  margin-left: calc(-1 * var(--space-2xl));
+  margin-right: calc(-1 * var(--space-2xl));
+  padding: 0 var(--space-2xl) var(--space-md) var(--space-2xl);
+  min-height: 140px;
+}
+
+.vd-content-card-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: var(--vd-marque-bg);
+  background-size: var(--vd-marque-size) auto;
+  background-position: var(--vd-marque-x) var(--vd-marque-y);
+  background-repeat: no-repeat;
+  opacity: 0.3;
+  filter: grayscale(100%);
+  pointer-events: none;
+}
+
+.vd-content-card-header .vd-badge,
+.vd-content-card-header .vd-title,
+.vd-content-card-header .vd-price {
+  position: relative;
+  z-index: 1;
 }
 
 .vd-badge {
@@ -1509,6 +1605,12 @@ img {
   .vd-content-card {
     padding: var(--space-xl);
   }
+  .vd-content-card-header {
+    margin-left: calc(-1 * var(--space-xl));
+    margin-right: calc(-1 * var(--space-xl));
+    padding-left: var(--space-xl);
+    padding-right: var(--space-xl);
+  }
   .vd-specs-block {
     margin-left: calc(-1 * var(--space-xl));
     padding-left: calc(var(--space-xl) + var(--space-lg) - 3px);
@@ -1518,12 +1620,12 @@ img {
     gap: var(--space-sm);
   }
   .vd-gallery-nav {
-    width: 40px;
-    min-height: 60px;
+    width: 36px;
+    min-height: 50px;
   }
   .vd-thumb {
-    width: 84px;
-    height: 56px;
+    width: 76px;
+    height: 50px;
   }
 }
 
@@ -1687,4 +1789,245 @@ img {
 .auth-link a {
   color: var(--secondary);
   font-weight: 500;
+}
+
+/* ----- Page contact — formulaire rendez-vous ----- */
+.contact-section {
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.contact-form-wrap {
+  background: rgba(43, 47, 52, 0.4);
+  border: 1px solid rgba(242, 242, 242, 0.08);
+  padding: var(--space-2xl);
+}
+
+.contact-messages {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-xl);
+}
+
+.contact-message {
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-sm);
+  font-size: 0.95rem;
+}
+
+.contact-message--success {
+  background: rgba(15, 61, 46, 0.6);
+  border: 1px solid rgba(191, 195, 201, 0.2);
+  color: var(--text);
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.contact-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xl);
+}
+
+@media (max-width: 640px) {
+  .contact-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.contact-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.contact-field label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.contact-input,
+.contact-select,
+.contact-textarea {
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  font-size: 1rem;
+  font-family: var(--font-body);
+  color: var(--text);
+  background: rgba(242, 242, 242, 0.06);
+  border: 1px solid rgba(242, 242, 242, 0.15);
+  transition: border-color 0.2s ease;
+}
+
+/* Select personnalisé : champ natif masqué, dropdown custom avec hover */
+.contact-select-field .contact-select-wrap {
+  position: relative;
+}
+
+.contact-select-field .contact-select-wrap select.contact-select {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.contact-select-custom {
+  position: relative;
+  width: 100%;
+}
+
+.contact-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  font-size: 1rem;
+  font-family: var(--font-body);
+  color: var(--text);
+  background: rgba(242, 242, 242, 0.06);
+  border: 1px solid rgba(242, 242, 242, 0.15);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  text-align: left;
+}
+
+.contact-select-trigger:hover {
+  border-color: rgba(191, 195, 201, 0.35);
+  background: rgba(242, 242, 242, 0.08);
+}
+
+.contact-select-arrow {
+  width: 1rem;
+  height: 1rem;
+  margin-left: 0.5rem;
+  flex-shrink: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23BFC3C9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat center;
+  background-size: contain;
+  transition: transform 0.2s ease;
+}
+
+.contact-select-custom.is-open .contact-select-arrow {
+  transform: rotate(180deg);
+}
+
+.contact-select-custom.is-open .contact-select-trigger {
+  border-color: var(--secondary);
+}
+
+.contact-select-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--primary-dark);
+  border: 1px solid rgba(242, 242, 242, 0.15);
+  border-top: none;
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  display: none;
+}
+
+.contact-select-custom.is-open .contact-select-dropdown {
+  display: block;
+}
+
+.contact-select-option {
+  padding: 0.65rem 0.9rem;
+  font-size: 1rem;
+  font-family: var(--font-body);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  border-bottom: 1px solid rgba(242, 242, 242, 0.06);
+}
+
+.contact-select-option:last-child {
+  border-bottom: none;
+}
+
+.contact-select-option.is-hover,
+.contact-select-option:hover {
+  background: var(--primary-light);
+  color: var(--secondary);
+}
+
+.contact-select-option.is-selected {
+  background: rgba(15, 61, 46, 0.9);
+  color: var(--secondary);
+}
+
+.contact-select-option.is-selected.is-hover,
+.contact-select-option.is-selected:hover {
+  background: var(--primary-light);
+  color: var(--secondary);
+}
+
+.contact-input:focus,
+.contact-select:focus,
+.contact-textarea:focus {
+  outline: none;
+  border-color: var(--secondary);
+}
+
+.contact-textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.contact-file-input {
+  padding: var(--space-sm);
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.contact-file-input::file-selector-button {
+  padding: 0.4rem 0.75rem;
+  margin-right: var(--space-md);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--tertiary);
+  background: var(--secondary);
+  border: none;
+  cursor: pointer;
+}
+
+.contact-help {
+  font-size: 0.8rem;
+  color: var(--text-subtle);
+}
+
+.contact-error {
+  font-size: 0.8rem;
+  color: #d88;
+}
+
+.contact-submit {
+  margin-top: var(--space-md);
+}
+
+.contact-submit .btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }

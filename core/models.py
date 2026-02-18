@@ -88,3 +88,54 @@ class ImageVehicule(models.Model):
         if self.image_url:
             return self.image_url
         return None
+
+
+class RendezVous(models.Model):
+    """Demande de rendez-vous depuis la page contact."""
+
+    RAISON_CHOICES = [
+        ("vendre", "Vendre son véhicule"),
+        ("interesse", "Intéressé par un véhicule"),
+        ("autre", "Autre"),
+    ]
+
+    nom = models.CharField(max_length=120)
+    prenom = models.CharField(max_length=120)
+    email = models.EmailField()
+    telephone = models.CharField(max_length=20)
+    raison = models.CharField(max_length=20, choices=RAISON_CHOICES)
+    message = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Demande de rendez-vous"
+        verbose_name_plural = "Demandes de rendez-vous"
+
+    def __str__(self):
+        return f"{self.prenom} {self.nom} — {self.get_raison_display()}"
+
+
+def contact_upload_to(instance, filename):
+    """Chemin sécurisé : contact_uploads/année/mois/uuid_nom_sanitifé."""
+    import uuid
+    import os
+    ext = os.path.splitext(filename)[1].lower()
+    safe_name = f"{uuid.uuid4().hex[:12]}{ext}"
+    return f"contact_uploads/{instance.rendez_vous.created_at:%Y/%m}/{safe_name}"
+
+
+class RendezVousFichier(models.Model):
+    """Pièce jointe d'une demande de rendez-vous."""
+
+    rendez_vous = models.ForeignKey(
+        RendezVous, on_delete=models.CASCADE, related_name="fichiers"
+    )
+    fichier = models.FileField(upload_to=contact_upload_to)
+
+    class Meta:
+        verbose_name = "Pièce jointe"
+        verbose_name_plural = "Pièces jointes"
+
+    def __str__(self):
+        return self.fichier.name

@@ -1,7 +1,33 @@
+import os
+import os
 from django import forms
 from django.forms import inlineformset_factory
 
-from .models import Vehicule, OptionVehicule, ImageVehicule
+from .models import Vehicule, OptionVehicule, ImageVehicule, RendezVous
+
+# Pièces jointes contact : extensions autorisées (documents + images)
+CONTACT_ALLOWED_EXTENSIONS = {
+    ".pdf", ".doc", ".docx", ".xls", ".xlsx",
+    ".jpg", ".jpeg", ".png", ".gif",
+}
+CONTACT_MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 Mo
+CONTACT_MAX_FILES = 5, RendezVous
+
+# Extensions autorisées pour les pièces jointes contact (pas de .exe, .config, etc.)
+CONTACT_ALLOWED_EXTENSIONS = {
+    ".pdf", ".doc", ".docx", ".xls", ".xlsx",
+    ".jpg", ".jpeg", ".png", ".gif",
+}
+CONTACT_MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 Mo
+CONTACT_MAX_FILES = 5
+
+
+class MultipleFileInput(forms.FileInput):
+    """Widget qui rend un <input type="file" multiple> sans déclencher l’erreur Django."""
+    def build_attrs(self, base_attrs, extra_attrs=None):
+        attrs = super().build_attrs(base_attrs, extra_attrs)
+        attrs["multiple"] = True
+        return attrs
 
 
 class VehiculeForm(forms.ModelForm):
@@ -88,3 +114,72 @@ ImageVehiculeFormSet = inlineformset_factory(
     can_delete=True,
     max_num=50,
 )
+
+
+class RendezVousForm(forms.ModelForm):
+    """Formulaire de prise de rendez-vous (page contact). Pièces jointes validées côté serveur."""
+
+    fichiers = forms.FileField(
+        required=False,
+        widget=MultipleFileInput(attrs={
+            "class": "contact-file-input",
+            "accept": ".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif",
+        }),
+        label="Pièces jointes (optionnel)",
+        help_text=f"Documents ou images. Max {CONTACT_MAX_FILES} fichiers, 10 Mo chacun. Types : PDF, DOC, DOCX, XLS, XLSX, JPG, PNG, GIF.",
+    )
+
+    class Meta:
+        model = RendezVous
+        fields = ["nom", "prenom", "email", "telephone", "raison", "message"]
+        labels = {
+            "nom": "Nom",
+            "prenom": "Prénom",
+            "email": "E-mail",
+            "telephone": "Téléphone",
+            "raison": "Raison de la demande",
+            "message": "Message (optionnel)",
+        }
+        widgets = {
+            "nom": forms.TextInput(attrs={"class": "contact-input", "placeholder": "Nom"}),
+            "prenom": forms.TextInput(attrs={"class": "contact-input", "placeholder": "Prénom"}),
+            "email": forms.EmailInput(attrs={"class": "contact-input", "placeholder": "Adresse e-mail"}),
+            "telephone": forms.TextInput(attrs={"class": "contact-input", "placeholder": "Téléphone"}),
+            "raison": forms.Select(attrs={"class": "contact-select"}),
+            "message": forms.Textarea(attrs={"class": "contact-textarea", "rows": 5, "placeholder": "Votre message..."}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request", None)
+        super().__init__(*args, **kwargs)
+
+    def clean_fichiers(self):
+        """On valide un seul fichier ici ; les multiples sont validés dans la vue."""
+        return self.cleaned_data.get("fichiers")
+
+    def clean(self):
+        data = super().clean()
+        if not self.request:
+            return data
+        files = self.request.FILES.getlist("fichiers")
+        if len(files) > CONTACT_MAX_FILES:
+            self.add_error(
+                "fichiers",
+                forms.ValidationError(f"Maximum {CONTACT_MAX_FILES} fichiers autorisés.")
+            )
+            return data
+        for f in files:
+            ext = os.path.splitext(getattr(f, "name", "") or "")[1].lower()
+            if ext not in CONTACT_ALLOWED_EXTENSIONS:
+                self.add_error(
+                    "fichiers",
+                    forms.ValidationError(f"Type de fichier non autorisé : {ext or '(inconnu)'}. Autorisés : PDF, DOC, DOCX, XLS, XLSX, JPG, PNG, GIF.")
+                )
+                break
+            if f.size > CONTACT_MAX_FILE_SIZE:
+                self.add_error(
+                    "fichiers",
+                    forms.ValidationError(f"Fichier trop volumineux : {f.name}. Maximum 10 Mo par fichier.")
+                )
+                break
+        return data

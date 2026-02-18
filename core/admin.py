@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin, TabularInline
-from .models import Vehicule, ImageVehicule, OptionVehicule
+from .models import Vehicule, ImageVehicule, OptionVehicule, RendezVous, RendezVousFichier
 
 
 class OptionVehiculeInline(TabularInline):
@@ -29,3 +29,18 @@ class OptionVehiculeAdmin(ModelAdmin):
 @admin.register(ImageVehicule)
 class ImageVehiculeAdmin(ModelAdmin):
     list_display = ("vehicule", "ordre", "legende")
+
+
+class RendezVousFichierInline(TabularInline):
+    model = RendezVousFichier
+    extra = 0
+    readonly_fields = ("fichier",)
+
+
+@admin.register(RendezVous)
+class RendezVousAdmin(ModelAdmin):
+    list_display = ("prenom", "nom", "email", "telephone", "raison", "created_at")
+    list_filter = ("raison", "created_at")
+    search_fields = ("nom", "prenom", "email")
+    readonly_fields = ("created_at",)
+    inlines = [RendezVousFichierInline]

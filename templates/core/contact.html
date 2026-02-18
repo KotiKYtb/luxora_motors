@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Contact & Rendez-vous{% endblock %}
+
+{% block content %}
+  <div class="page-hero">
+    <h1 class="page-hero-title">Contact</h1>
+    <p class="page-hero-desc">Demandez un rendez-vous — visite et essai sur rendez-vous uniquement</p>
+  </div>
+
+  <section class="section contact-section">
+    <div class="contact-form-wrap">
+      {% if messages %}
+        <ul class="contact-messages">
+          {% for message in messages %}
+            <li class="contact-message contact-message--{{ message.tags }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <form class="contact-form" method="post" action="{% url 'contact' %}" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        <div class="contact-row">
+          <div class="contact-field">
+            <label for="id_nom">{{ form.nom.label }}</label>
+            {{ form.nom }}
+            {% if form.nom.errors %}<span class="contact-error">{{ form.nom.errors.0 }}</span>{% endif %}
+          </div>
+          <div class="contact-field">
+            <label for="id_prenom">{{ form.prenom.label }}</label>
+            {{ form.prenom }}
+            {% if form.prenom.errors %}<span class="contact-error">{{ form.prenom.errors.0 }}</span>{% endif %}
+          </div>
+        </div>
+        <div class="contact-row">
+          <div class="contact-field">
+            <label for="id_email">{{ form.email.label }}</label>
+            {{ form.email }}
+            {% if form.email.errors %}<span class="contact-error">{{ form.email.errors.0 }}</span>{% endif %}
+          </div>
+          <div class="contact-field">
+            <label for="id_telephone">{{ form.telephone.label }}</label>
+            {{ form.telephone }}
+            {% if form.telephone.errors %}<span class="contact-error">{{ form.telephone.errors.0 }}</span>{% endif %}
+          </div>
+        </div>
+        <div class="contact-field contact-select-field">
+          <label for="id_raison">{{ form.raison.label }}</label>
+          <div class="contact-select-wrap">
+            {{ form.raison }}
+            <div class="contact-select-custom" id="custom-raison" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-label="Raison de la demande">
+              <button type="button" class="contact-select-trigger" tabindex="0">
+                <span class="contact-select-value">Choisir une raison</span>
+                <span class="contact-select-arrow" aria-hidden="true"></span>
+              </button>
+              <ul class="contact-select-dropdown" role="listbox" id="custom-raison-list">
+                {% for value, label in form.raison.field.choices %}
+                  <li class="contact-select-option" role="option" data-value="{{ value }}">{{ label }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+          {% if form.raison.errors %}<span class="contact-error">{{ form.raison.errors.0 }}</span>{% endif %}
+        </div>
+        <div class="contact-field">
+          <label for="id_message">{{ form.message.label }}</label>
+          {{ form.message }}
+          {% if form.message.errors %}<span class="contact-error">{{ form.message.errors.0 }}</span>{% endif %}
+        </div>
+        <div class="contact-field">
+          <label for="id_fichiers">{{ form.fichiers.label }}</label>
+          {{ form.fichiers }}
+          {% if form.fichiers.help_text %}<span class="contact-help">{{ form.fichiers.help_text }}</span>{% endif %}
+          {% if form.fichiers.errors %}<span class="contact-error">{{ form.fichiers.errors.0 }}</span>{% endif %}
+        </div>
+        <div class="contact-submit">
+          <button type="submit" class="btn btn-primary btn-shine">Envoyer la demande</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <script>
+  (function () {
+    var wrap = document.querySelector(".contact-select-wrap");
+    if (!wrap) return;
+    var select = wrap.querySelector("select.contact-select");
+    var custom = wrap.querySelector(".contact-select-custom");
+    var trigger = wrap.querySelector(".contact-select-trigger");
+    var valueSpan = wrap.querySelector(".contact-select-value");
+    var dropdown = wrap.querySelector(".contact-select-dropdown");
+    var options = wrap.querySelectorAll(".contact-select-option");
+
+    function open() {
+      custom.classList.add("is-open");
+      custom.setAttribute("aria-expanded", "true");
+    }
+    function close() {
+      custom.classList.remove("is-open");
+      custom.setAttribute("aria-expanded", "false");
+    }
+    function setValue(value, label) {
+      if (select) select.value = value;
+      if (valueSpan) valueSpan.textContent = label || "Choisir une raison";
+      options.forEach(function (opt) {
+        opt.classList.toggle("is-selected", opt.getAttribute("data-value") === value);
+      });
+    }
+
+    options.forEach(function (opt) {
+      opt.addEventListener("click", function () {
+        setValue(opt.getAttribute("data-value"), opt.textContent);
+        close();
+      });
+      opt.addEventListener("mouseenter", function () { opt.classList.add("is-hover"); });
+      opt.addEventListener("mouseleave", function () { opt.classList.remove("is-hover"); });
+    });
+
+    if (trigger) {
+      trigger.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (custom.classList.contains("is-open")) close();
+        else open();
+      });
+    }
+    document.addEventListener("click", function (e) {
+      if (custom && custom.classList.contains("is-open") && !custom.contains(e.target)) close();
+    });
+
+    var selected = select && select.options[select.selectedIndex];
+    if (selected && selected.value) setValue(selected.value, selected.textContent);
+  })();
+  </script>
+{% endblock %}

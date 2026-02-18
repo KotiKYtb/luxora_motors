@@ -54,9 +54,11 @@
       <!-- Colonne droite : infos + specs + accordéons + CTA -->
       <div class="vd-content">
         <div class="vd-content-card">
-          <span class="vd-badge">{{ vehicule.get_marque_display }}</span>
-          <h1 class="vd-title">{{ vehicule.titre }}</h1>
-          <p class="vd-price">{{ vehicule.prix|floatformat:0 }} €</p>
+          <div class="vd-content-card-header" style="--vd-marque-bg: url('{{ marque_image_url }}');{% if marque_logo_size %} --vd-marque-size: {{ marque_logo_size }};{% endif %}{% if marque_logo_x %} --vd-marque-x: {{ marque_logo_x }};{% endif %}{% if marque_logo_y %} --vd-marque-y: {{ marque_logo_y }};{% endif %}">
+            <span class="vd-badge">{{ vehicule.get_marque_display }}</span>
+            <h1 class="vd-title">{{ vehicule.titre }}</h1>
+            <p class="vd-price">{{ vehicule.prix|floatformat:0 }} €</p>
+          </div>
 
           <div class="vd-specs-block">
             <ul class="vd-specs-inline">
