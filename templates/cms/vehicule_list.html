@@ -1,4 +1,5 @@
 {% extends "cms/base_cms.html" %}
+{% load core_extras %}
 {% block title %}Véhicules{% endblock %}
 
 {% block content %}
@@ -35,7 +36,7 @@
             <td>{{ v.titre }}</td>
             <td>{{ v.get_marque_display }}</td>
             <td>{{ v.annee }}</td>
-            <td>{{ v.prix|floatformat:0 }} €</td>
+            <td>{{ v.prix|intspace }} €</td>
             <td>{% if v.en_vedette %}Oui{% else %}—{% endif %}</td>
             <td class="cms-cell-actions">
               <a href="{% url 'cms_vehicule_edit' v.pk %}" class="cms-btn cms-btn-sm cms-btn-outline">Modifier</a>

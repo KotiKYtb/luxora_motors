@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load core_extras %}
 
 {% block title %}Notre collection{% endblock %}
 
@@ -121,8 +122,8 @@
               <span class="card-badge">{{ v.get_marque_display }}</span>
               <div class="card-specs-overlay">
                 <div class="card-specs-overlay-inner">
-                  <p class="card-specs-line-overlay">{{ v.annee }} · {{ v.kilometrage|floatformat:0 }} km{% if v.puissance_ch %} · {{ v.puissance_ch }} ch{% endif %}</p>
-                  <p class="card-specs-price-overlay">{{ v.prix|floatformat:0 }} €</p>
+                  <p class="card-specs-line-overlay">{{ v.annee }} · {{ v.kilometrage|intspace }} km{% if v.puissance_ch %} · {{ v.puissance_ch }} ch{% endif %}</p>
+                  <p class="card-specs-price-overlay">{{ v.prix|intspace }} €</p>
                   <span class="card-specs-cta">Découvrir</span>
                 </div>
               </div>
@@ -130,7 +131,7 @@
             <div class="card-body">
               <h3 class="card-title">{{ v.titre }}</h3>
               <p class="card-marque">{{ v.get_marque_display }}</p>
-              <p class="card-specs-line">{{ v.annee }} · {{ v.kilometrage|floatformat:0 }} km · <strong>{{ v.prix|floatformat:0 }} €</strong></p>
+              <p class="card-specs-line">{{ v.annee }} · {{ v.kilometrage|intspace }} km · <strong>{{ v.prix|intspace }} €</strong></p>
               {% if v.options.exists %}
                 <ul class="card-options-list">
                   {% for opt in v.options.all %}

@@ -165,7 +165,6 @@
   content: "";
   position: absolute;
   inset: 0;
-  : 0;
   padding: 1px;
   background: linear-gradient(135deg, transparent, rgba(191, 195, 201, 0.2), transparent, rgba(191, 195, 201, 0.1));
   background-size: 300% 300%;
@@ -296,17 +295,6 @@
 .page-hero {
   position: relative;
   overflow: hidden;
-}
-
-.page-hero::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(191, 195, 201, 0.4), transparent);
-  opacity: 0.6;
 }
 
 /* ========== Logo hover ========== */

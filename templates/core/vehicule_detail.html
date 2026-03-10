@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load core_extras %}
 
 {% block title %}{{ vehicule.titre }}{% endblock %}
 {% block body_class %}page-vehicule-detail{% endblock %}
@@ -7,6 +8,14 @@
 {% block content %}
   <article class="vd-page">
     <div class="vd-layout">
+      <!-- Fil d'Ariane au-dessus de tout le contenu -->
+      <nav class="vd-breadcrumb" aria-label="Fil d'Ariane">
+        <a href="{% url 'home' %}">Accueil</a>
+        <span class="vd-breadcrumb-sep" aria-hidden="true"></span>
+        <a href="{% url 'vehicule_list' %}">À vendre</a>
+        <span class="vd-breadcrumb-sep" aria-hidden="true"></span>
+        <span class="vd-breadcrumb-current" aria-current="page">{{ vehicule.titre }}</span>
+      </nav>
       <!-- Colonne gauche : galerie -->
       <div class="vd-gallery">
         <div class="vd-gallery-main">
@@ -57,7 +66,7 @@
           <div class="vd-content-card-header" style="--vd-marque-bg: url('{{ marque_image_url }}');{% if marque_logo_size %} --vd-marque-size: {{ marque_logo_size }};{% endif %}{% if marque_logo_x %} --vd-marque-x: {{ marque_logo_x }};{% endif %}{% if marque_logo_y %} --vd-marque-y: {{ marque_logo_y }};{% endif %}">
             <span class="vd-badge">{{ vehicule.get_marque_display }}</span>
             <h1 class="vd-title">{{ vehicule.titre }}</h1>
-            <p class="vd-price">{{ vehicule.prix|floatformat:0 }} €</p>
+            <p class="vd-price">{{ vehicule.prix|intspace }} €</p>
           </div>
 
           <div class="vd-specs-block">
@@ -66,7 +75,7 @@
             <span class="vd-spec-icon" aria-hidden="true">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
             </span>
-            <span>Kilométrage : {{ vehicule.kilometrage|floatformat:0 }} km</span>
+            <span>Kilométrage : {{ vehicule.kilometrage|intspace }} km</span>
           </li>
           <li>
             <span class="vd-spec-icon" aria-hidden="true">

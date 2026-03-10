@@ -142,11 +142,10 @@ img {
 }
 
 .header-inner {
-  max-width: 1400px;
   margin: 0 auto;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-xl);
   width: 100%;
 }
@@ -196,7 +195,6 @@ img {
   display: flex;
   gap: var(--space-xl);
   align-items: center;
-  flex: 1;
   justify-content: center;
 }
 
@@ -222,6 +220,7 @@ img {
 .header-right {
   display: flex;
   align-items: center;
+  justify-self: end;
   gap: var(--space-md);
   flex-shrink: 0;
 }
@@ -1365,18 +1364,6 @@ body.nav-open .nav-mobile {
   position: relative;
 }
 
-.page-hero::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--secondary-muted), transparent);
-  opacity: 0.8;
-}
-
 .page-hero-title {
   font-family: var(--font-display);
   font-size: clamp(2.25rem, 4vw, 3.25rem);
@@ -1943,15 +1930,14 @@ body.nav-open .nav-mobile {
 }
 
 /* ----- Page détail véhicule (refonte) ----- */
-.vd-page {
-  padding-bottom: var(--space-3xl);
-}
-
 /* Page détail : navbar transparente sur l'image (pas de liseré) */
 /* ----- Page détail véhicule : 2 colonnes (galerie | contenu) ----- */
 .vd-page {
   background: linear-gradient(180deg, var(--primary-dark) 0%, var(--primary) 25%, var(--primary) 100%);
-  padding: var(--space-3xl) var(--space-xl);
+  padding-top: calc(var(--header-height) + 12rem);
+  padding-right: var(--space-xl);
+  padding-bottom: var(--space-3xl);
+  padding-left: var(--space-xl);
   min-height: 70vh;
 }
 
@@ -1960,14 +1946,16 @@ body.nav-open .nav-mobile {
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1.2fr 1fr;
-  gap: var(--space-3xl);
+  column-gap: var(--space-3xl);
+  row-gap: var(--space-sm);
   align-items: start;
 }
 
 @media (max-width: 960px) {
   .vd-layout {
     grid-template-columns: 1fr;
-    gap: var(--space-2xl);
+    column-gap: 0;
+    row-gap: var(--space-2xl);
   }
 }
 
@@ -1978,6 +1966,45 @@ body.nav-open .nav-mobile {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
+}
+
+/* Fil d'Ariane juste au-dessus de l'image (span full width, petit écart) */
+.vd-breadcrumb {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs) var(--space-sm);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.vd-breadcrumb a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.vd-breadcrumb a:hover {
+  color: var(--text);
+}
+
+.vd-breadcrumb-sep {
+  color: rgba(242, 242, 242, 0.4);
+  user-select: none;
+}
+
+.vd-breadcrumb-sep::after {
+  content: "›";
+}
+
+.vd-breadcrumb-current {
+  color: var(--text);
+  font-weight: 500;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Cadre image principale : hauteur de la box fixe (16:9), image toute la largeur */
@@ -2474,7 +2501,10 @@ body.nav-open .nav-mobile {
 
 @media (max-width: 640px) {
   .vd-page {
-    padding: var(--space-2xl) var(--space-md);
+    padding-top: calc(var(--header-height) + 5rem);
+    padding-right: var(--space-md);
+    padding-bottom: var(--space-2xl);
+    padding-left: var(--space-md);
   }
   .vd-gallery {
     position: static;
