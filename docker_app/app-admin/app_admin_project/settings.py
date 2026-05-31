@@ -20,6 +20,8 @@ CSRF_COOKIE_NAME = "luxora_admin_csrftoken"
 # Acces admin localhost reserve si Tailscale actif (desactive avec TAILSCALE_ADMIN_REQUIRED=0)
 TAILSCALE_ADMIN_REQUIRED = os.getenv("TAILSCALE_ADMIN_REQUIRED", "1") in {"1", "true", "True"}
 PUBLIC_SITE_URL = os.getenv("PUBLIC_SITE_URL", "http://127.0.0.1:8000")
+PUBLIC_SITE_PORT = os.getenv("PUBLIC_SITE_PORT", "8000")
+PUBLIC_SITE_USE_REQUEST_HOST = os.getenv("PUBLIC_SITE_USE_REQUEST_HOST", "1") in {"1", "true", "True"}
 TAILSCALE_STATUS_FILE = os.getenv("TAILSCALE_STATUS_FILE", "/shared/.tailscale_active")
 
 MIDDLEWARE = [

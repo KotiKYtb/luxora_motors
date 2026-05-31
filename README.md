@@ -48,11 +48,11 @@ La stack Docker est définie dans `docker_app/docker-compose.yml` avec separatio
 - `docker_app/app-documents` : projet Django documents internes
 - `docker_app/db-init` : scripts SQL optionnels executes au premier demarrage MySQL
 
-Services exposes :
+Services exposes (accessibles via IP du serveur, ex. `http://192.168.1.10:8000`) :
 
-- `app_user` (public) sur `http://127.0.0.1:8000`
-- `app_admin` (admin/cms) sur `http://127.0.0.1:8001`
-- `app_documents` (documents) sur `http://127.0.0.1:8002`
+- `app_user` (public) sur le port **8000** — toujours accessible
+- `app_admin` (CMS) sur le port **8001** — Tailscale requis sur le serveur
+- `app_documents` sur le port **8002** — Tailscale requis sur le serveur
 - `database` (MySQL) isolee sur le reseau interne
 
 Lancement :
@@ -71,21 +71,22 @@ docker compose up --build
 - Django admin CMS : http://127.0.0.1:8001/admin/
 - Django admin documents : http://127.0.0.1:8002/admin/
 
-### Acces via Tailscale (localhost)
+### Acces via Tailscale (IP serveur ou localhost)
 
-Les apps admin (`8001`) et documents (`8002`) restent sur **localhost**.
-L’accès n’est autorisé que si Tailscale est **connecté** sur la machine hôte.
-Sinon, redirection vers le site public (`8000`).
+- **Site public (8000)** : accessible via l'IP du serveur sans Tailscale.
+- **CMS (8001) et documents (8002)** : accessibles via la meme IP **uniquement si Tailscale est connecte sur le serveur**. Sinon redirection vers le site public (`8000`).
 
 1. Lancer la stack Docker :
    - `cd docker_app && docker compose up -d --build`
-2. Lancer la surveillance Tailscale (2e fenetre PowerShell) :
-   - `.\scripts\tailscale-watch.ps1`
-3. Ouvrir en local (Tailscale actif) :
-   - CMS : http://127.0.0.1:8001/cms/
-   - Documents : http://127.0.0.1:8002/
+2. Lancer la surveillance Tailscale :
+   - **Linux/Debian** : `chmod +x scripts/tailscale-watch.sh && ./scripts/tailscale-watch.sh`
+   - **Windows** : `.\scripts\tailscale-watch.ps1`
+3. Acceder (remplacer `IP_SERVEUR` par l'IP de la machine) :
+   - Site : `http://IP_SERVEUR:8000/`
+   - CMS : `http://IP_SERVEUR:8001/cms/` (Tailscale actif)
+   - Documents : `http://IP_SERVEUR:8002/` (Tailscale actif)
 
-Pour desactiver temporairement (dev local) : `TAILSCALE_ADMIN_REQUIRED: "0"` dans `docker-compose.yml`.
+Pour desactiver temporairement la protection : `TAILSCALE_ADMIN_REQUIRED: "0"` dans `docker-compose.yml`.
 
 
 ## Acces MySQL (Docker)

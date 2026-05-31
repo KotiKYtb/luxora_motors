@@ -1,6 +1,7 @@
-"""Middleware de protection de l'application admin via Tailscale."""
+"""Middleware de protection des apps admin/documents via Tailscale."""
 
 from pathlib import Path
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.http import HttpResponseRedirect
@@ -8,7 +9,7 @@ from django.utils.deprecation import MiddlewareMixin
 
 
 def is_tailscale_active() -> bool:
-    """Lit l'etat Tailscale ecrit par le script hote (scripts/tailscale-watch.ps1)."""
+    """Lit l'etat Tailscale ecrit par le script hote (tailscale-watch)."""
     status_file = Path(getattr(settings, "TAILSCALE_STATUS_FILE", "/shared/.tailscale_active"))
     if not status_file.is_file():
         return False
@@ -17,23 +18,37 @@ def is_tailscale_active() -> bool:
     }
 
 
+def public_site_redirect_url(request) -> str:
+    """
+    URL de redirection vers le site public (8000).
+    Reprend l'hote de la requete (IP serveur ou localhost) si possible.
+    """
+    configured = getattr(settings, "PUBLIC_SITE_URL", "http://127.0.0.1:8000")
+    public_port = getattr(settings, "PUBLIC_SITE_PORT", "8000")
+
+    if getattr(settings, "PUBLIC_SITE_USE_REQUEST_HOST", True):
+        host = request.get_host().split(":")[0]
+        parsed = urlparse(configured)
+        scheme = parsed.scheme or ("https" if request.is_secure() else "http")
+        return f"{scheme}://{host}:{public_port}/"
+
+    return configured
+
+
 class TailscaleAdminMiddleware(MiddlewareMixin):
     """
-    Autorise l'admin sur localhost uniquement si Tailscale est actif sur la machine hote.
+    Protege admin/documents : acces autorise uniquement si Tailscale est actif sur le serveur.
 
-    - Tailscale actif + http://127.0.0.1:8001 -> acces admin autorise.
-    - Tailscale inactif -> redirection vers le site public (8000).
+    - Site public (8000) : non concerne par ce middleware.
+    - CMS (8001) et documents (8002) : accessibles via IP serveur ou localhost si Tailscale actif.
+    - Tailscale inactif : redirection vers le site public sur le meme hote (port 8000).
     """
 
     def process_request(self, request):
         if not getattr(settings, "TAILSCALE_ADMIN_REQUIRED", True):
             return None
 
-        host = request.get_host().split(":")[0].lower()
-        if host not in {"127.0.0.1", "localhost", "::1"}:
-            return HttpResponseRedirect(settings.PUBLIC_SITE_URL)
-
         if is_tailscale_active():
             return None
 
-        return HttpResponseRedirect(settings.PUBLIC_SITE_URL)
+        return HttpResponseRedirect(public_site_redirect_url(request))

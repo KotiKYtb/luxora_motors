@@ -18,9 +18,9 @@
       <a href="{% url 'cms_vehicule_list' %}" class="cms-logo">cms · luxora Motors</a>
       <nav class="cms-nav">
         <a href="{% url 'cms_vehicule_list' %}" {% if request.resolver_match.url_name == 'cms_vehicule_list' or request.resolver_match.url_name == 'cms_vehicule_edit' or request.resolver_match.url_name == 'cms_vehicule_delete' or request.resolver_match.url_name == 'cms_vehicule_create' %}class="cms-nav-active"{% endif %}>Véhicules</a>
-        <a href="http://127.0.0.1:8002/" target="_blank" rel="noopener">Documents</a>
+        <a href="{{ LUXORA_DOCUMENTS_URL }}/" target="_blank" rel="noopener">Documents</a>
         <a href="{% url 'cms_vehicule_create' %}" {% if request.resolver_match.url_name == 'cms_vehicule_create' %}class="cms-nav-active"{% endif %}>Ajouter un véhicule</a>
-        <a href="http://127.0.0.1:8000/" target="_blank" rel="noopener">Voir le site</a>
+        <a href="{{ LUXORA_PUBLIC_URL }}/" target="_blank" rel="noopener">Voir le site</a>
         <a href="{% url 'admin:logout' %}">Déconnexion</a>
       </nav>
     </div>

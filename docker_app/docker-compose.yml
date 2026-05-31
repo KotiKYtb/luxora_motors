@@ -47,6 +47,8 @@ services:
       MYSQL_PASSWORD: luxora_password
       TAILSCALE_ADMIN_REQUIRED: "1"
       PUBLIC_SITE_URL: "http://127.0.0.1:8000"
+      PUBLIC_SITE_PORT: "8000"
+      PUBLIC_SITE_USE_REQUEST_HOST: "1"
       TAILSCALE_STATUS_FILE: /shared/.tailscale_active
     volumes:
       - ../docker_app/app-admin:/code
@@ -58,7 +60,7 @@ services:
       - admin_net
       - dbz_net
     ports:
-      - "127.0.0.1:8001:8001"
+      - "8001:8001"
 
   app_documents:
     build:
@@ -79,6 +81,8 @@ services:
       MYSQL_PASSWORD: luxora_password
       TAILSCALE_ADMIN_REQUIRED: "1"
       PUBLIC_SITE_URL: "http://127.0.0.1:8000"
+      PUBLIC_SITE_PORT: "8000"
+      PUBLIC_SITE_USE_REQUEST_HOST: "1"
       TAILSCALE_STATUS_FILE: /shared/.tailscale_active
     volumes:
       - ../docker_app/app-documents:/code
@@ -90,7 +94,7 @@ services:
       - documents_net
       - dbz_net
     ports:
-      - "127.0.0.1:8002:8002"
+      - "8002:8002"
 
   database:
     image: mysql:8.4
