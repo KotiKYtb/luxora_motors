@@ -11,12 +11,14 @@ services:
 
   app_admin:
     network_mode: host
-    ports: []
+    ports: !reset []
+    networks: !reset []
     environment:
       MYSQL_HOST: 127.0.0.1
 
   app_documents:
     network_mode: host
-    ports: []
+    ports: !reset []
+    networks: !reset []
     environment:
       MYSQL_HOST: 127.0.0.1
