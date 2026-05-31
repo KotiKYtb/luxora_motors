@@ -58,6 +58,7 @@ cover/
 
 # Django stuff:
 *.log
+.tailscale_active
 local_settings.py
 db.sqlite3
 db.sqlite3-journal

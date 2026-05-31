@@ -1,0 +1,125 @@
+services:
+  app_user:
+    build:
+      context: ..
+      dockerfile: docker_app/app-user/Dockerfile
+    container_name: luxora_app_user
+    command: >
+      sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    environment:
+      DJANGO_SETTINGS_MODULE: app_user_project.settings
+      SHARED_PROJECT_ROOT: /shared
+      DJANGO_DEBUG: "1"
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1,*
+      MYSQL_HOST: database
+      MYSQL_PORT: "3306"
+      MYSQL_DATABASE: luxora_motors
+      MYSQL_USER: luxora_user
+      MYSQL_PASSWORD: luxora_password
+    volumes:
+      - ../docker_app/app-user:/code
+      - ..:/shared
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - dmz_net
+      - dbz_net
+    ports:
+      - "8000:8000"
+
+  app_admin:
+    build:
+      context: ..
+      dockerfile: docker_app/app-admin/Dockerfile
+    container_name: luxora_app_admin
+    command: >
+      sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8001"
+    environment:
+      DJANGO_SETTINGS_MODULE: app_admin_project.settings
+      SHARED_PROJECT_ROOT: /shared
+      DJANGO_DEBUG: "1"
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1,*
+      MYSQL_HOST: database
+      MYSQL_PORT: "3306"
+      MYSQL_DATABASE: luxora_motors
+      MYSQL_USER: luxora_user
+      MYSQL_PASSWORD: luxora_password
+      TAILSCALE_ADMIN_REQUIRED: "1"
+      PUBLIC_SITE_URL: "http://127.0.0.1:8000"
+      TAILSCALE_STATUS_FILE: /shared/.tailscale_active
+    volumes:
+      - ../docker_app/app-admin:/code
+      - ..:/shared
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - admin_net
+      - dbz_net
+    ports:
+      - "127.0.0.1:8001:8001"
+
+  app_documents:
+    build:
+      context: ..
+      dockerfile: docker_app/app-documents/Dockerfile
+    container_name: luxora_app_documents
+    command: >
+      sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8002"
+    environment:
+      DJANGO_SETTINGS_MODULE: app_documents_project.settings
+      SHARED_PROJECT_ROOT: /shared
+      DJANGO_DEBUG: "1"
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1,*
+      MYSQL_HOST: database
+      MYSQL_PORT: "3306"
+      MYSQL_DATABASE: luxora_motors
+      MYSQL_USER: luxora_user
+      MYSQL_PASSWORD: luxora_password
+      TAILSCALE_ADMIN_REQUIRED: "1"
+      PUBLIC_SITE_URL: "http://127.0.0.1:8000"
+      TAILSCALE_STATUS_FILE: /shared/.tailscale_active
+    volumes:
+      - ../docker_app/app-documents:/code
+      - ..:/shared
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - documents_net
+      - dbz_net
+    ports:
+      - "127.0.0.1:8002:8002"
+
+  database:
+    image: mysql:8.4
+    container_name: luxora_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password_super_secure
+      MYSQL_DATABASE: luxora_motors
+      MYSQL_USER: luxora_user
+      MYSQL_PASSWORD: luxora_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - dbz_net
+
+networks:
+  dmz_net:
+    driver: bridge
+  admin_net:
+    driver: bridge
+  documents_net:
+    driver: bridge
+  dbz_net:
+    internal: true
+
+volumes:
+  mysql_data:

@@ -1,0 +1,43 @@
+{% extends "documents/base_documents.html" %}
+{% block title %}Documents{% endblock %}
+
+{% block content %}
+  <div class="cms-page-header">
+    <h1 class="cms-page-title">Documents véhicules</h1>
+    <p class="cms-page-subtitle">Répertoire interne — accès réservé (Tailscale requis)</p>
+  </div>
+
+  <div class="cms-table-wrap">
+    <table class="cms-table">
+      <thead>
+        <tr>
+          <th>Véhicule</th>
+          <th>Marque</th>
+          <th>Année</th>
+          <th>Documents</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for v in vehicules %}
+          <tr>
+            <td>{{ v.titre }}</td>
+            <td>{{ v.get_marque_display }}</td>
+            <td>{{ v.annee }}</td>
+            <td>
+              <span class="cms-badge">{{ v.nb_documents }}</span>
+            </td>
+            <td class="cms-cell-actions">
+              <a href="{% url 'cms_document_list' v.pk %}" class="cms-btn cms-btn-sm cms-btn-outline">Voir / gérer</a>
+              <a href="{% url 'cms_document_create' v.pk %}" class="cms-btn cms-btn-sm cms-btn-primary">+ Document</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5" class="cms-empty">Aucun véhicule enregistré.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

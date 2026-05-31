@@ -1,0 +1,35 @@
+{% extends "documents/base_documents.html" %}
+{% block title %}Documents — {{ vehicule.titre }}{% endblock %}
+
+{% block content %}
+  <div class="cms-page-header">
+    <div>
+      <a href="{% url 'cms_document_vehicule_list' %}" class="cms-back-link">← Tous les véhicules</a>
+      <h1 class="cms-page-title">Documents — {{ vehicule.titre }}</h1>
+      <p class="cms-page-subtitle">{{ vehicule.get_marque_display }} · {{ vehicule.annee }}</p>
+    </div>
+    <a href="{% url 'cms_document_create' vehicule.pk %}" class="cms-btn cms-btn-primary">+ Ajouter un document</a>
+  </div>
+
+  <div class="cms-doc-filters">
+    <a href="{% url 'cms_document_list' vehicule.pk %}" class="cms-filter-chip{% if not type_filter %} cms-filter-chip--active{% endif %}">Tous</a>
+    {% for value, label in type_choices %}
+      <a href="?type={{ value }}" class="cms-filter-chip{% if type_filter == value %} cms-filter-chip--active{% endif %}">{{ label }}</a>
+    {% endfor %}
+  </div>
+
+  {% if grouped_documents %}
+    {% for group in grouped_documents %}
+      <section class="cms-doc-section">
+        <h2 class="cms-doc-section-title">{{ group.label }}</h2>
+        <div class="cms-doc-grid">
+          {% for doc in group.documents %}
+            {% include "documents/_document_card.html" %}
+          {% endfor %}
+        </div>
+      </section>
+    {% endfor %}
+  {% else %}
+    <p class="cms-empty">Aucun document pour ce véhicule. <a href="{% url 'cms_document_create' vehicule.pk %}">Ajouter le premier</a>.</p>
+  {% endif %}
+{% endblock %}

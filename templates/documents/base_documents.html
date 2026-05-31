@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}cms{% endblock %} | luxora Motors</title>
+  <title>{% block title %}Documents{% endblock %} | luxora Motors</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
@@ -15,12 +15,11 @@
 <body class="cms-body">
   <header class="cms-header">
     <div class="cms-header-inner">
-      <a href="{% url 'cms_vehicule_list' %}" class="cms-logo">cms · luxora Motors</a>
+      <a href="{% url 'cms_document_vehicule_list' %}" class="cms-logo">documents · luxora Motors</a>
       <nav class="cms-nav">
-        <a href="{% url 'cms_vehicule_list' %}" {% if request.resolver_match.url_name == 'cms_vehicule_list' or request.resolver_match.url_name == 'cms_vehicule_edit' or request.resolver_match.url_name == 'cms_vehicule_delete' or request.resolver_match.url_name == 'cms_vehicule_create' %}class="cms-nav-active"{% endif %}>Véhicules</a>
-        <a href="http://127.0.0.1:8002/" target="_blank" rel="noopener">Documents</a>
-        <a href="{% url 'cms_vehicule_create' %}" {% if request.resolver_match.url_name == 'cms_vehicule_create' %}class="cms-nav-active"{% endif %}>Ajouter un véhicule</a>
-        <a href="http://127.0.0.1:8000/" target="_blank" rel="noopener">Voir le site</a>
+        <a href="{% url 'cms_document_vehicule_list' %}" {% if request.resolver_match.url_name == 'cms_document_vehicule_list' %}class="cms-nav-active"{% endif %}>Répertoire</a>
+        <a href="http://127.0.0.1:8001/cms/" target="_blank" rel="noopener">CMS véhicules</a>
+        <a href="http://127.0.0.1:8000/" target="_blank" rel="noopener">Site public</a>
         <a href="{% url 'admin:logout' %}">Déconnexion</a>
       </nav>
     </div>

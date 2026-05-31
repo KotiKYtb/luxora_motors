@@ -1,19 +1,10 @@
 import os
-import os
+
 from django import forms
 from django.forms import inlineformset_factory
 
 from .models import Vehicule, OptionVehicule, ImageVehicule, RendezVous
 
-# Pièces jointes contact : extensions autorisées (documents + images)
-CONTACT_ALLOWED_EXTENSIONS = {
-    ".pdf", ".doc", ".docx", ".xls", ".xlsx",
-    ".jpg", ".jpeg", ".png", ".gif",
-}
-CONTACT_MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 Mo
-CONTACT_MAX_FILES = 5, RendezVous
-
-# Extensions autorisées pour les pièces jointes contact (pas de .exe, .config, etc.)
 CONTACT_ALLOWED_EXTENSIONS = {
     ".pdf", ".doc", ".docx", ".xls", ".xlsx",
     ".jpg", ".jpeg", ".png", ".gif",

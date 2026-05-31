@@ -825,3 +825,130 @@
   position: absolute;
   inset: 0;
 }
+
+/* Documents véhicules */
+.cms-page-subtitle {
+  margin: 0.35rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.cms-back-link {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.cms-back-link:hover {
+  color: var(--text);
+}
+
+.cms-badge {
+  display: inline-block;
+  min-width: 1.75rem;
+  padding: 0.15rem 0.5rem;
+  text-align: center;
+  background: rgba(15, 61, 46, 0.5);
+  border: 1px solid rgba(191, 195, 201, 0.25);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.cms-doc-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: var(--space-xl);
+}
+
+.cms-filter-chip {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid rgba(242, 242, 242, 0.15);
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.cms-filter-chip:hover,
+.cms-filter-chip--active {
+  color: var(--text);
+  border-color: var(--secondary);
+  background: rgba(191, 195, 201, 0.08);
+}
+
+.cms-doc-section {
+  margin-bottom: var(--space-xl);
+}
+
+.cms-doc-section-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  margin: 0 0 var(--space-md);
+  color: var(--text);
+}
+
+.cms-doc-grid {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.cms-doc-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--space-md);
+  align-items: start;
+  padding: var(--space-md);
+  background: rgba(242, 242, 242, 0.03);
+  border: 1px solid rgba(242, 242, 242, 0.08);
+}
+
+.cms-doc-card-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--tertiary);
+  border: 1px solid rgba(242, 242, 242, 0.1);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--secondary);
+}
+
+.cms-doc-card-title {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.cms-doc-card-meta,
+.cms-doc-card-notes {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.cms-doc-card-notes {
+  margin-top: 0.35rem;
+}
+
+.cms-doc-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+@media (max-width: 720px) {
+  .cms-doc-card {
+    grid-template-columns: 1fr;
+  }
+
+  .cms-doc-card-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
