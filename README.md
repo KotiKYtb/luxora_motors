@@ -71,22 +71,48 @@ docker compose up --build
 - Django admin CMS : http://127.0.0.1:8001/admin/
 - Django admin documents : http://127.0.0.1:8002/admin/
 
-### Acces via Tailscale (IP serveur ou localhost)
+### Acces CMS / documents (liste blanche IP Tailscale)
 
-- **Site public (8000)** : accessible via l'IP du serveur sans Tailscale.
-- **CMS (8001) et documents (8002)** : accessibles via la meme IP **uniquement si Tailscale est connecte sur le serveur**. Sinon redirection vers le site public (`8000`).
+Les apps tournent sur **l'IP de la machine** (ex. `http://192.168.1.10:8000`).
 
-1. Lancer la stack Docker :
-   - `cd docker_app && docker compose up -d --build`
-2. Lancer la surveillance Tailscale :
-   - **Linux/Debian** : `chmod +x scripts/tailscale-watch.sh && ./scripts/tailscale-watch.sh`
-   - **Windows** : `.\scripts\tailscale-watch.ps1`
-3. Acceder (remplacer `IP_SERVEUR` par l'IP de la machine) :
-   - Site : `http://IP_SERVEUR:8000/`
-   - CMS : `http://IP_SERVEUR:8001/cms/` (Tailscale actif)
-   - Documents : `http://IP_SERVEUR:8002/` (Tailscale actif)
+- **Site public (`8000`)** : accessible par tout le monde.
+- **CMS (`8001`) et documents (`8002`)** : accessibles **uniquement** si l'**IP Tailscale du client** est enregistree sur la VM.
 
-Pour desactiver temporairement la protection : `TAILSCALE_ADMIN_REQUIRED: "0"` dans `docker-compose.yml`.
+Sinon → redirection vers le site public.
+
+**Enregistrer un utilisateur autorise** — editer `config/allowed_tailscale_ips.txt` sur la VM :
+
+```bash
+# Recuperer son IP Tailscale (sur le PC de l'utilisateur)
+tailscale ip -4
+
+# Ajouter la ligne dans le fichier sur le serveur
+nano ~/luxora_motors/config/allowed_tailscale_ips.txt
+# ex. 100.108.154.112
+```
+
+Pas besoin de redemarrer Docker : le fichier est relu a chaque requete.
+
+**Acces utilisateur autorise** (ex. IP machine `192.168.1.10`) :
+- CMS : `http://192.168.1.10:8001/cms/`
+- Documents : `http://192.168.1.10:8002/`
+
+Dev local Windows : `TAILSCALE_ALLOW_LOCALHOST: "1"` dans `docker-compose.yml`.
+
+### Debian / production Linux
+
+Sur Linux, Docker masque souvent l'IP cliente. Utiliser le compose production :
+
+```bash
+cd docker_app
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+```
+
+Supprimer l'ancien fichier obsolete (ancienne logique) :
+
+```bash
+rm -f ~/luxora_motors/.tailscale_active
+```
 
 
 ## Acces MySQL (Docker)

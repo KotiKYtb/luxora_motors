@@ -1,0 +1,22 @@
+# Override production Linux (Debian) — preserve l'IP reelle des clients.
+# Usage : docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Necessaire pour que la liste blanche Tailscale (100.x.x.x) fonctionne :
+# sans cela Docker remplace souvent l'IP cliente par 172.x.x.x.
+
+services:
+  database:
+    ports:
+      - "127.0.0.1:3306:3306"
+
+  app_admin:
+    network_mode: host
+    ports: []
+    environment:
+      MYSQL_HOST: 127.0.0.1
+
+  app_documents:
+    network_mode: host
+    ports: []
+    environment:
+      MYSQL_HOST: 127.0.0.1

@@ -1,0 +1,9 @@
+# IP Tailscale autorisees (100.x.x.x) — une par ligne.
+# Seuls ces utilisateurs peuvent acceder au CMS (8001) et documents (8002).
+# L'URL reste l'IP de la machine, ex. http://192.168.1.10:8001/cms/
+#
+# Recuperer son IP Tailscale : tailscale ip -4
+#
+# Exemple :
+100.108.154.112
+# 100.64.20.55

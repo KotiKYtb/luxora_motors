@@ -13,16 +13,23 @@ ASGI_APPLICATION = "app_admin_project.asgi.application"
 LOGIN_URL = "/admin/login/"
 LOGIN_REDIRECT_URL = "/cms/"
 
-# Evite les collisions de cookies entre app_user (8000) et app_admin (8001)
 SESSION_COOKIE_NAME = "luxora_admin_sessionid"
 CSRF_COOKIE_NAME = "luxora_admin_csrftoken"
 
-# Acces admin localhost reserve si Tailscale actif (desactive avec TAILSCALE_ADMIN_REQUIRED=0)
 TAILSCALE_ADMIN_REQUIRED = os.getenv("TAILSCALE_ADMIN_REQUIRED", "1") in {"1", "true", "True"}
+TAILSCALE_ALLOW_LOCALHOST = os.getenv("TAILSCALE_ALLOW_LOCALHOST", "0") in {"1", "true", "True"}
+TRUST_X_FORWARDED_FOR = os.getenv("TRUST_X_FORWARDED_FOR", "0") in {"1", "true", "True"}
+TAILSCALE_ALLOWED_CLIENT_IPS = [
+    ip.strip()
+    for ip in os.getenv("TAILSCALE_ALLOWED_CLIENT_IPS", "").split(",")
+    if ip.strip()
+]
+TAILSCALE_CLIENTS_FILE = os.getenv(
+    "TAILSCALE_CLIENTS_FILE", "/shared/config/allowed_tailscale_ips.txt"
+)
 PUBLIC_SITE_URL = os.getenv("PUBLIC_SITE_URL", "http://127.0.0.1:8000")
 PUBLIC_SITE_PORT = os.getenv("PUBLIC_SITE_PORT", "8000")
 PUBLIC_SITE_USE_REQUEST_HOST = os.getenv("PUBLIC_SITE_USE_REQUEST_HOST", "1") in {"1", "true", "True"}
-TAILSCALE_STATUS_FILE = os.getenv("TAILSCALE_STATUS_FILE", "/shared/.tailscale_active")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

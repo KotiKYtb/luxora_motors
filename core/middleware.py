@@ -1,5 +1,7 @@
-"""Middleware de protection des apps admin/documents via Tailscale."""
+"""Middleware : acces CMS/documents reserve aux IP Tailscale autorisees."""
 
+import ipaddress
+import logging
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -7,22 +9,59 @@ from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.utils.deprecation import MiddlewareMixin
 
+logger = logging.getLogger(__name__)
 
-def is_tailscale_active() -> bool:
-    """Lit l'etat Tailscale ecrit par le script hote (tailscale-watch)."""
-    status_file = Path(getattr(settings, "TAILSCALE_STATUS_FILE", "/shared/.tailscale_active"))
-    if not status_file.is_file():
+
+def _parse_ip(addr: str):
+    try:
+        return ipaddress.ip_address(addr.strip())
+    except ValueError:
+        return None
+
+
+def get_client_ip(request):
+    if getattr(settings, "TRUST_X_FORWARDED_FOR", False):
+        forwarded = request.META.get("HTTP_X_FORWARDED_FOR", "")
+        if forwarded:
+            return _parse_ip(forwarded.split(",")[0])
+    return _parse_ip(request.META.get("REMOTE_ADDR", ""))
+
+
+def _load_allowed_client_ips() -> set[str]:
+    ips = set(getattr(settings, "TAILSCALE_ALLOWED_CLIENT_IPS", []))
+
+    clients_file = getattr(settings, "TAILSCALE_CLIENTS_FILE", "")
+    if clients_file:
+        path = Path(clients_file)
+        if path.is_file():
+            for line in path.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                ips.add(line.split("#", 1)[0].strip())
+
+    return ips
+
+
+def client_is_allowed(request) -> bool:
+    if getattr(settings, "TAILSCALE_ALLOW_LOCALHOST", False):
+        host = request.get_host().split(":")[0].lower()
+        if host in {"127.0.0.1", "localhost", "::1"}:
+            return True
+
+    client_ip = get_client_ip(request)
+    if not client_ip:
         return False
-    return status_file.read_text(encoding="utf-8-sig").strip().lower() in {
-        "1", "true", "yes", "on", "connected"
-    }
+
+    allowed = _load_allowed_client_ips()
+    if not allowed:
+        logger.warning("Liste blanche Tailscale vide — acces CMS/documents refuse.")
+        return False
+
+    return str(client_ip) in allowed
 
 
 def public_site_redirect_url(request) -> str:
-    """
-    URL de redirection vers le site public (8000).
-    Reprend l'hote de la requete (IP serveur ou localhost) si possible.
-    """
     configured = getattr(settings, "PUBLIC_SITE_URL", "http://127.0.0.1:8000")
     public_port = getattr(settings, "PUBLIC_SITE_PORT", "8000")
 
@@ -36,19 +75,19 @@ def public_site_redirect_url(request) -> str:
 
 
 class TailscaleAdminMiddleware(MiddlewareMixin):
-    """
-    Protege admin/documents : acces autorise uniquement si Tailscale est actif sur le serveur.
-
-    - Site public (8000) : non concerne par ce middleware.
-    - CMS (8001) et documents (8002) : accessibles via IP serveur ou localhost si Tailscale actif.
-    - Tailscale inactif : redirection vers le site public sur le meme hote (port 8000).
-    """
+    """Protege CMS (8001) et documents (8002) via liste blanche IP Tailscale."""
 
     def process_request(self, request):
         if not getattr(settings, "TAILSCALE_ADMIN_REQUIRED", True):
             return None
 
-        if is_tailscale_active():
+        if client_is_allowed(request):
             return None
 
+        client_ip = get_client_ip(request)
+        logger.info(
+            "Acces CMS/documents refuse — IP cliente=%s, autorisees=%s",
+            client_ip,
+            sorted(_load_allowed_client_ips()),
+        )
         return HttpResponseRedirect(public_site_redirect_url(request))

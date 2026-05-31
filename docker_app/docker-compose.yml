@@ -46,10 +46,11 @@ services:
       MYSQL_USER: luxora_user
       MYSQL_PASSWORD: luxora_password
       TAILSCALE_ADMIN_REQUIRED: "1"
+      TAILSCALE_ALLOW_LOCALHOST: "0"
+      TAILSCALE_CLIENTS_FILE: /shared/config/allowed_tailscale_ips.txt
       PUBLIC_SITE_URL: "http://127.0.0.1:8000"
       PUBLIC_SITE_PORT: "8000"
       PUBLIC_SITE_USE_REQUEST_HOST: "1"
-      TAILSCALE_STATUS_FILE: /shared/.tailscale_active
     volumes:
       - ../docker_app/app-admin:/code
       - ..:/shared
@@ -80,10 +81,11 @@ services:
       MYSQL_USER: luxora_user
       MYSQL_PASSWORD: luxora_password
       TAILSCALE_ADMIN_REQUIRED: "1"
+      TAILSCALE_ALLOW_LOCALHOST: "0"
+      TAILSCALE_CLIENTS_FILE: /shared/config/allowed_tailscale_ips.txt
       PUBLIC_SITE_URL: "http://127.0.0.1:8000"
       PUBLIC_SITE_PORT: "8000"
       PUBLIC_SITE_USE_REQUEST_HOST: "1"
-      TAILSCALE_STATUS_FILE: /shared/.tailscale_active
     volumes:
       - ../docker_app/app-documents:/code
       - ..:/shared
