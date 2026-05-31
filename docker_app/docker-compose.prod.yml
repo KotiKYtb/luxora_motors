@@ -1,8 +1,12 @@
 # Override production Linux (Debian) — preserve l'IP reelle des clients.
 # Usage : docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 #
-# Necessaire pour que la liste blanche Tailscale (100.x.x.x) fonctionne :
-# sans cela Docker remplace souvent l'IP cliente par 172.x.x.x.
+# app_admin / app_documents en network_mode: host voient la vraie IP cliente.
+# MySQL doit etre joignable sur 127.0.0.1:3306 (dbz_net internal=false requis).
+
+networks:
+  dbz_net:
+    internal: false
 
 services:
   database:
@@ -15,6 +19,9 @@ services:
     networks: !reset []
     environment:
       MYSQL_HOST: 127.0.0.1
+    command: >
+      sh -c "until python -c \"import socket; s=socket.socket(); s.settimeout(1); s.connect(('127.0.0.1',3306)); s.close()\" 2>/dev/null; do echo 'En attente MySQL...'; sleep 2; done;
+      python manage.py migrate && python manage.py runserver 0.0.0.0:8001"
 
   app_documents:
     network_mode: host
@@ -22,3 +29,6 @@ services:
     networks: !reset []
     environment:
       MYSQL_HOST: 127.0.0.1
+    command: >
+      sh -c "until python -c \"import socket; s=socket.socket(); s.settimeout(1); s.connect(('127.0.0.1',3306)); s.close()\" 2>/dev/null; do echo 'En attente MySQL...'; sleep 2; done;
+      python manage.py migrate && python manage.py runserver 0.0.0.0:8002"

@@ -101,18 +101,19 @@ Dev local Windows : `TAILSCALE_ALLOW_LOCALHOST: "1"` dans `docker-compose.yml`.
 
 ### Debian / production Linux
 
-Sur Linux, Docker masque souvent l'IP cliente. Utiliser le compose production :
-
 ```bash
 cd docker_app
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ```
 
-Supprimer l'ancien fichier obsolete (ancienne logique) :
+Verifications :
 
 ```bash
-rm -f ~/luxora_motors/.tailscale_active
+ss -tlnp | grep -E ':3306|:8001|:8002'
+docker compose -f docker-compose.yml -f docker-compose.prod.yml ps -a
 ```
+
+MySQL doit apparaitre sur `127.0.0.1:3306` et les apps admin/documents en **Up** (pas Exited).
 
 
 ## Acces MySQL (Docker)
